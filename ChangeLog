@@ -1,8 +1,12 @@
+2000-05-02  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Fixed one remaining bug in Mkaefile.am.
+
 2000-04-27  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
 
 	* Released fribidi-0.1.10 .
 
-	* Added libtool configuration added by Manish Sing.
+	* Added libtool configuration added by Manish Singh.
 
 	* Added sevaral arabic charset converts contributed by Pablo
  	Saratxaga.

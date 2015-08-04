@@ -4,5 +4,5 @@ With patches by:
 
 Raphael Finkel <raphael@cs.uky.edu>       - utf8 converters
 Pablo Saratxaga <pablo@mandrakesoft.com>  - several arabic charset converters
-Manish Sing <yosh@gimp.org>               - automake update
+Manish Singh <yosh@gimp.org>               - automake update
 Owen Taylor <otaylor@redhat.com>	  - plugged some memory leaks

@@ -1,6 +1,3 @@
-LIBS = `glib-config --libs`
-CFLAGS = -g -Wall `glib-config --cflags`
-
 noinst_PROGRAMS = test_fribidi fribidi_benchmark
 
 INCLUDES = $(GLIB_CFLAGS)

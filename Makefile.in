@@ -73,9 +73,6 @@ PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 
-LIBS = `glib-config --libs`
-CFLAGS = -g -Wall `glib-config --cflags`
-
 noinst_PROGRAMS = test_fribidi fribidi_benchmark
 
 INCLUDES = $(GLIB_CFLAGS)
@@ -117,6 +114,7 @@ LTLIBRARIES =  $(lib_LTLIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) -I.
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
 libfribidi_la_LDFLAGS = 
 libfribidi_la_DEPENDENCIES = 
 libfribidi_la_OBJECTS =  fribidi.lo fribidi_char_sets.lo \
@@ -134,6 +132,7 @@ fribidi_benchmark_DEPENDENCIES =  libfribidi.la
 fribidi_benchmark_LDFLAGS = 
 SCRIPTS =  $(bin_SCRIPTS)
 
+CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)

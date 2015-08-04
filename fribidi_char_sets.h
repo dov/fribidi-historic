@@ -31,4 +31,14 @@ void            fribidi_unicode_to_iso8859_8       (FriBidiChar *us,
 						    /* Output */
 						    guchar *s);
 
+FriBidiChar     fribidi_iso8859_6_to_unicode_c     (guchar ch);
+void            fribidi_iso8859_6_to_unicode       (guchar *s,
+						    /* Output */
+						    FriBidiChar *us);
+guchar          fribidi_unicode_to_iso8859_6_c     (FriBidiChar uch);
+void            fribidi_unicode_to_iso8859_6       (FriBidiChar *us,
+						    int length,
+						    /* Output */
+						    guchar *s);
+
 #endif

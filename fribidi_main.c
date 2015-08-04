@@ -64,6 +64,8 @@ void charset_to_unicode(gint char_set,
 	    us[i] = s[i];
 	}
     }
+  else if (char_set == 6)
+      fribidi_iso8859_6_to_unicode(s, us);
   else if (char_set == 8)
       fribidi_iso8859_8_to_unicode(s, us);
   else
@@ -94,6 +96,8 @@ void unicode_to_charset(gint char_set,
 	}
       s[i] = 0;
     }
+  else if (char_set == 6)
+    fribidi_unicode_to_iso8859_6(us, length, s); 
   else if (char_set == 8)
     fribidi_unicode_to_iso8859_8(us, length, s);
   else

@@ -10,9 +10,7 @@ AM_CONFIG_HEADER(config.h)
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
-
-dnl Initialize libtool
-AM_PROG_LIBTOOL
+AC_PROG_RANLIB
 
 # Check that glib exists by looking for glib.h
 AC_CHECK_HEADER(glib.h)

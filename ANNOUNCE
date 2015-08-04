@@ -1,26 +1,19 @@
-I have relased a new version 0.1.2 of fribidi with the following changes:
+I have relased a new version 0.1.9 of fribidi with the following major
+changes:
 
-	* Added options -ltr and -rtl to fribidi to force LTR and RTL 
-	  directions.
+    * Changed basic type FriBidiChar to guint32 which corresponds
+      to UCS4.
 
-	* Added function fribidi_log2vis_get_embedding_levels() which
-	  just returns an array of embedding levels.
+    * Added the missing rule EN,ET=>EN,EN , and thus fixed a major
+      bug in the algorithm.
 
-	* Added benchmark program.
+    * Fixed several memory leaks found by Owen Taylor.
 
-	* Added new check in test_fribidi that checks the changes 
-	  calculation.
-
-	* Changed interface to fribidi_log2vis() to include length of
-	  string on input and the embedding level of output.
-	
-	* Added function fribidi_find_string_changes() which finds the
-	  bounding box of the changes between two FriBidiStrings.
 
 Here's the blurb in case someone missed it:
 
-FriBidi is a free BiDi library that adhers closely to the Unicode BiDi
-algorithm.
+FriBidi is a free BiDi library that should adher closely to the Unicode 
+BiDi algorithm.
 
 FriBidi is written in C and should provide a common API that will 
 facilitate porting of various software to support BiDirection 

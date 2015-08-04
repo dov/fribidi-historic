@@ -21,13 +21,15 @@
 
 #include <glib.h>
 
-typedef guint16 FriBidiChar;
+typedef guint32 FriBidiChar;
 
 /* Classifications of the various Bidi properties */
 typedef enum
 {
   FRIBIDI_TYPE_LTR = 0x01000000, /* Strong left to right */
   FRIBIDI_TYPE_RTL = 0x02000000, /* Strong right to left */
+  FRIBIDI_TYPE_WL  = 0x01000001, /* Weak left to right */
+  FRIBIDI_TYPE_WR  = 0x02000002, /* Weak right to left */
   FRIBIDI_TYPE_EN  = 0x03000000, /* European digit */
   FRIBIDI_TYPE_ES  = 0x04000000, /* European number separator */
   FRIBIDI_TYPE_ET  = 0x05000000, /* European number terminator */
@@ -49,5 +51,11 @@ typedef enum
   FRIBIDI_TYPE_N   = 0xF5000000, 
   FRIBIDI_TYPE_E   = 0xF6000000, 
 } FriBidiCharType;
+
+/* The following type is used by fribidi_utils */
+typedef struct {
+  int length;
+  void *attribute;
+} FriBidiRunType;
 
 #endif

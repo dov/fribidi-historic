@@ -154,6 +154,7 @@ static void compact_list(GList *list)
 	  list->prev->next = list->next;
 	  list->next->prev = list->prev;
 	  RL_LEN(list->prev) = RL_LEN(list->prev) + RL_LEN(list);
+	  g_free(list->data);
 	  g_list_free_1(list);
 	  list = next;
       }
@@ -329,6 +330,7 @@ fribidi_analyse_string(/* input */
 
   /* Run length encode the character types */
   type_rl_list = run_length_encode_types(char_type, len);
+  g_free(char_type);
 
   /* Find the base level */
   if (*pbase_dir == FRIBIDI_TYPE_L)
@@ -347,20 +349,39 @@ fribidi_analyse_string(/* input */
   else
     {
       base_level = 0; /* Default */
-      base_dir = FRIBIDI_TYPE_L;
+      base_dir = FRIBIDI_TYPE_N;
       for (pp = type_rl_list; pp; pp = pp->next)
-	if (RL_TYPE(pp) == FRIBIDI_TYPE_R)
-	  {
-	    base_level = 1;
-	    base_dir = FRIBIDI_TYPE_R;
-	    break;
-	  }
-	else if (RL_TYPE(pp) == FRIBIDI_TYPE_L)
-	  {
-	    base_level = 0;
-	    base_dir = FRIBIDI_TYPE_L;
-	    break;
-	  }
+	{
+	  if (RL_TYPE(pp) == FRIBIDI_TYPE_R)
+	    {
+	      base_level = 1;
+	      base_dir = FRIBIDI_TYPE_R;
+	      break;
+	    }
+	  else if (RL_TYPE(pp) == FRIBIDI_TYPE_L)
+	    {
+	      base_level = 0;
+	      base_dir = FRIBIDI_TYPE_L;
+	      break;
+	    }
+	}
+    
+      /* If no strong base_dir was found, resort to the weak direction
+       * that was passed on input.
+       */
+      if (base_dir == FRIBIDI_TYPE_N)
+	{
+	  if (*pbase_dir == FRIBIDI_TYPE_WR)
+	    {
+	      base_dir = FRIBIDI_TYPE_RTL;
+	      base_level = 1;
+	    }
+	  else if (*pbase_dir == FRIBIDI_TYPE_WL)
+	    {
+	      base_dir = FRIBIDI_TYPE_LTR;
+	      base_level = 0;
+	    }
+	}
     }
   
   /* 1. Explicit Levels and Directions. TBD! */
@@ -405,6 +426,8 @@ fribidi_analyse_string(/* input */
 
       /* P2. */
       TYPE_RULE2(ET,EN,   EN,EN);
+      TYPE_RULE2(EN,ET,   EN,EN);
+      TYPE_RULE_C(AN,ET,EN,   EN);
     }
 
   compact_list(type_rl_list);
@@ -718,6 +741,7 @@ void fribidi_log2vis(/* input */
   }
 
   /* Free up the rl_list */
+  g_list_foreach(type_rl_list, (GFunc)g_free, NULL);
   g_list_free(type_rl_list);
 
   /* Free up L_to_V if we allocated it */
@@ -758,6 +782,7 @@ void fribidi_log2vis_get_embedding_levels(
     }
 
   /* Free up the rl_list */
+  g_list_foreach(type_rl_list, (GFunc)g_free, NULL);
   g_list_free(type_rl_list);
 }
 

@@ -1,3 +1,54 @@
+2000-03-20  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Released fribidi-0.1.9 .
+
+2000-02-22  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* fribidi_types.h: Changed basic type FriBidiChar to guint32
+	  which corresponds to UCS4, which is more reasonable to use.
+
+2000-02-21  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* tests/test-capital-rtl: Added new tests to check percentage
+	  signs and updated tests.reference to reflect this.
+
+	* fribidi.c(fribidi_analyse_string): Added the rule 
+	  EN,ET=>EN,EN which takes care of the problem of percentage
+	  signs were put in the wrong place.
+
+2000-02-20  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* fribidi.c: Fixed several memory leaks found by Owen Taylor.
+
+2000-01-01  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Added documentation of the utility functions to fribidi.h .
+
+1999-12-24  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Added new function fribidi_is_char_rtl() that uses the 
+	embedding levels or the base dir to determine the resolved
+	direction of a character.
+
+	* Added new function fribidi_xpos_resolve() to fribidi_utils 
+	that is needed in an gui interaction to resolve a mouse event 
+	to the proper logical and visual positions.
+	
+
+1999-12-21  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Added patches for UTF8 support contributed by raphael@cs.uky.edu.
+
+1999-12-05  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Added two new types FRIBIDI_TYPE_WL and FRIBIDI_TYPE_WR that
+	indicate weak directions. These directions are used if no strong
+	direction is found in the string.
+
+	* Changed analyse_string() to return base_type FRIBIDI_TYPE_N if
+	the base direction cannot be determined. It is then up to a higher
+	level protocol to determine the base direction.
+
 1999-11-22  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
 
 	* Released version 0.1.7.

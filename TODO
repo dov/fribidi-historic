@@ -1,8 +1,8 @@
 BiDi algorithms issues:
 
-* Support LRE, RLE, RLO and LRO.
+* Change code to support latest revisions of the unicode technical report.
 
-* Handle automatic convertion of european numerals to arabic numerals.
+* Support LRE, RLE, RLO and LRO.
 
 General issues:
 
@@ -38,8 +38,6 @@ General issues:
   BiDi aware editor.
 
 * Make interfaces to other scripting languages if there is any interest.
-
-* Implement string comparison which finds changes bounding box.
 
 * Consider the implications of a minimal incremental algorithm for
   adding a single character.

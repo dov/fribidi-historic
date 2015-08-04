@@ -46,11 +46,13 @@ void die(gchar *fmt, ...)
 void charset_to_unicode(gint char_set,
 			guchar *s,
 			/* output */
-			FriBidiChar *us)
+			FriBidiChar *us,
+			int *length
+			)
 {
   int i;
   int len = strlen(s);
-  
+
   if (char_set == 0)
     {
       /* Convert A-Z into hebrew characters */
@@ -68,6 +70,8 @@ void charset_to_unicode(gint char_set,
       fribidi_iso8859_6_to_unicode(s, us);
   else if (char_set == 8)
       fribidi_iso8859_8_to_unicode(s, us);
+  else if (char_set == 1)
+      *length = fribidi_utf8_to_unicode(s, us);
   else
     die("Sorry! Not implemented!\n");
 }
@@ -100,6 +104,8 @@ void unicode_to_charset(gint char_set,
     fribidi_unicode_to_iso8859_6(us, length, s); 
   else if (char_set == 8)
     fribidi_unicode_to_iso8859_8(us, length, s);
+  else if (char_set == 1)
+      (void) fribidi_unicode_to_utf8(us, length, s);
   else
     die("Sorry! Not implemented!\n");
 }
@@ -138,6 +144,7 @@ int main(int argc, char *argv[])
 		 "    -charset cs  Specify charset. Default is CapRTL. Available options are:\n"
 		 "                     * 8859-8 (Hebrew)\n"
 		 "                     * 8859-6 (Arabic)\n"
+                 "                     * UTF-8\n"
 
 		 );
 	  
@@ -156,6 +163,7 @@ int main(int argc, char *argv[])
 	  while(1) {
 	    CASE("8859-8") { char_set = 8; break; }
 	    CASE("8859-6") { char_set = 6; break; }
+            CASE("UTF-8")  { char_set = 1; break; }
 	    die("Unknown char set %s!\n", S_);
 	  }
 	  continue;
@@ -179,7 +187,7 @@ int main(int argc, char *argv[])
 
   /* Read and process input one line at a time */
   {
-    gchar S_[2048];
+    guchar S_[2048];
     
     while(fgets(S_, sizeof(S_), IN))
       {
@@ -188,14 +196,14 @@ int main(int argc, char *argv[])
 	guchar outstring[2048];
 	FriBidiCharType base;
 	int i;
-	
+
 	/* chop */
 	if (S_[len-1] == '\n')
 	  S_[len-1] = '\0';
 
 	len--;
 
-	charset_to_unicode(char_set, S_, us);
+	charset_to_unicode(char_set, S_, us, &len);
       
 	/* Create a bidi string */
 	base = input_base_direction;
@@ -223,7 +231,7 @@ int main(int argc, char *argv[])
 	if (eol_text)
 	  printf("%s", eol_text);
 	printf("\n");
-      }
+      } /* one line worth */
   }
   return 0;
 }

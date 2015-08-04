@@ -123,3 +123,63 @@ fribidi_unicode_to_iso8859_6(FriBidiChar *us,
   s[i] = 0;
 }
 
+/* the following added by Raphael Finkel <raphael@cs.uky.edu> 12/1999 */
+
+void
+fribidi_unicode_to_utf8(FriBidiChar *us,
+                           int length,
+                           guchar *s)
+/* warning: the length of output string may exceed the length of the input */
+
+{
+  int i;
+
+  for (i=0; i< length; i++)
+    {
+      FriBidiChar mychar = us[i];
+      if (mychar <= 0x7F) { /* 7 sig bits; plain 7-bit ascii */
+	*s++ = mychar;
+      } else if (mychar <= 0x7FF) /* 11 sig bits; Hebrew is in this range */
+	{
+	  *s++ = 0300 | (guint8) ((mychar >> 6)&037);
+	  *s++ = 0200 | (guint8) (mychar & 077); /* lower 6 bits */
+	} else if (mychar <= 0xFFFF) { /* 16 sig bits */
+	  *s++ = 0340 | (guint8) ((mychar >> 12)&017), /* upper 4 bits */
+	  *s++ = 0200 | (guint8) ((mychar >> 6)&077),  /* next 6 bits */
+	  *s++ = 0200 | (guint8) (mychar & 077);       /* lowest 6 bits */
+	}
+    }
+  *s = 0;
+}
+
+
+int /* we return the length */
+fribidi_utf8_to_unicode(guchar *s,
+			FriBidiChar *us)
+/* warning: the length of input string may exceed the length of the output */
+{
+  int length;
+  
+  length = 0;
+  while (*s) {
+    if (*s <= 0177) /* one byte */
+      {
+	*us++ = *s++; /* expand with 0s */
+      }
+    else if (*s < 0340) /* 2 chars, such as Hebrew */
+      {
+	*us++ = ((*s & 037) << 6) + (*(s+1) & 077);
+	s += 2;
+      }
+    else /* 3 chars */
+      {
+	*us++ = ((*s & 017) << 12) + ((*(s+1) & 077) << 6) +
+	  (*(s+2) & 077);
+	s += 3;
+      }
+    length += 1;
+  }
+  *us = 0;
+  return(length);
+}
+

@@ -1,14 +1,14 @@
-I have relased a new version 0.1.12 of fribidi with the following 
-major changes:
+I have relased a new version 0.1.15 of fribidi which is mainly based
+on a set of excellent patches that I received from Omer Zak
+<omerz@actcom.co.il>. The highlights of the changes are:
 
-     * Applied a speed patch by Owen Taylor that makes fribidi almost
-       4 times faster.
+     * Made several compile options for better fine tuning for embedded
+       systems.
 
-     * Updated the algorithm according to the latest Unicode specification.
-       (Still no explicit overrides though).
+     * Fixed some bugs in complience of unicode algorithm.
 
-     * Added support for the LRM and RLM characters for the iso-8859-8 
-       converts at unused positions 0xFE and 0xFF . 
+     * Fixed interface in which the v2l and the l2v maps were
+       mixed up.
 
 Here's the blurb in case someone missed it:
 

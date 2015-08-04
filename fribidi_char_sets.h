@@ -90,4 +90,48 @@ int             fribidi_utf8_to_unicode             (guchar *s,
                                                      FriBidiChar *us);
 /* the length of the string is returned */
 
-#endif
+/* the following added by Omer Zak <omerz@actcom.co.il> Sept 2000.
+** The following functions do the same thing, but have better-defined
+** interfaces.
+*/
+
+gboolean  /* Returns TRUE if the outputs are valid, even if the entire
+	  ** Unicode string was not converted.
+	  */
+fribidi_unicode_to_utf8_p(FriBidiChar *in_unicode_str,  /* Unicode string */
+			  guint in_unicode_length,      /* Unicode string length in
+							** Unicode characters
+							*/
+			  guchar *utf8_buffer,          /* Buffer for UTF8 translation */
+			  guint utf8_buffer_length,     /* Length of UTF8 buffer */
+			  /* Outputs */
+			  guint *out_uni_consumed_length_p,
+			                                /* Actual number of Unicode
+							** characters translated
+							*/
+			  guint *out_actual_utf8_buffer_length_p);
+                                                        /* Actual number of bytes
+							** used in the UTF8 buffer.
+							*/
+
+gboolean  /* Returns TRUE if the entire UTF8 string was converted without errors. */
+fribidi_utf8_to_unicode_p(guchar *in_utf8_str,          /* UTF8 string */
+			  guint in_utf8_length,         /* Length of UTF8 string in octets */
+			  FriBidiChar *unicode_buffer,  /* Buffer for Unicode translation */
+			  guint unicode_buffer_length,  /* Length of Unicode buffer in
+							** Unicode characters
+							*/
+			  /* Outputs */
+			  guint *out_utf8_consumed_length_p,
+			                                /* Actual number of UTF8
+							** octets translated
+							*/
+			  guint *out_actual_unicode_buffer_length_p);
+                                                        /* Actual number of Unicode
+							** characters used in the
+							** Unicode buffer.
+							*/
+
+
+#endif /* FRIBIDI_CHAR_SETS_H */
+

@@ -1,3 +1,44 @@
+2000-11-12  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* fribidi.c: [OZ] Applied Owen Taylor's patch from 2000-07-19 to
+	fribidi.c.  The patch affects pp->prev rules for the last element
+	in cases W3 and W7.
+	
+	* fribidi.c: [OZ] fribidi_log2vis() and
+	fribidi_log2vis_get_embedding_levels() now check for len==0 and if
+	so, they return immediately (instead of getting stuck).
+
+	* fribidi.c: [OZ] new_type_link() is now declared as
+	new_type_link(void) to prevent a compiler error message.
+
+	* fribidi.c: [OZ] The positions of the is_v2l_map and len
+	arguments in fribidi_map_range() prototype were switched around,
+	to conform to actual use in the source code file. 
+	
+	* fribidi.c: [OZ] The first argument to fribidi_is_char_rtl() was
+	changed from gint8 to guint8, to conform to data type returned by
+	fribidi_log2vis().  
+	
+	* fribidi.c: [OZ] bidi_string_strlen() now uses gint rather than int.
+
+	* fribidi.c: [OZ] bidi_string_reverse() now uses gint rather than int.
+	
+	* fribidi.c: [OZ] int16_array_reverse() is now guint16_array_reverse().
+
+	* fribidi.c: Added define symbols NO_STDIO, FRIBIDI_MAX_STRING_LENGTH,
+	USE_SIMPLE_MALLOC that may be used to effect what code is being 
+	generated.
+
+	* fribidi_char_sets.h, fribidi_char_sets.c : Added Omer Zaks more 
+	general ut8 to unicode and unicode to ut8 functions.
+	
+	* fribidi.c: [OZ] Replaced int to gint to better support embedded
+	libraries.
+
+	* Applied lots of code contributed by Omer Zak <omerz@actcom.co.il> ,
+	detailed above.
+	
+
 2000-10-14  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
 
 	* Released fribidi-0.1.14.

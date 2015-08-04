@@ -425,21 +425,6 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-fribidi.lo fribidi.o : fribidi.c fribidi.h fribidi_types.h \
-	fribidi_char_sets.h
-fribidi_benchmark.o: fribidi_benchmark.c fribidi.h fribidi_types.h \
-	fribidi_char_sets.h
-fribidi_char_sets.lo fribidi_char_sets.o : fribidi_char_sets.c fribidi.h \
-	fribidi_types.h fribidi_char_sets.h
-fribidi_get_type.lo fribidi_get_type.o : fribidi_get_type.c fribidi.h \
-	fribidi_types.h fribidi_char_sets.h fribidi_tables.i
-fribidi_main.o: fribidi_main.c fribidi.h fribidi_types.h \
-	fribidi_char_sets.h
-fribidi_utils.lo fribidi_utils.o : fribidi_utils.c fribidi.h \
-	fribidi_types.h fribidi_char_sets.h
-test_fribidi.o: test_fribidi.c fribidi.h fribidi_types.h \
-	fribidi_char_sets.h
-
 check-TESTS: $(TESTS)
 	@failed=0; all=0; \
 	srcdir=$(srcdir); export srcdir; \

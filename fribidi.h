@@ -118,7 +118,7 @@ fribidi_map_range (gint span[2],
 //  if the embedding level for the character is odd.
 //----------------------------------------------------------------------*/
 gboolean
-fribidi_is_char_rtl(gint8 *embedding_level_list,
+fribidi_is_char_rtl(guint8 *embedding_level_list,
 		    FriBidiCharType base_dir,
 		    int idx);
 
@@ -185,4 +185,4 @@ void fribidi_xpos_resolve(gint x_pos,
 			  gboolean *res_cursor_dir_is_rtl,
 			  gboolean *res_attach_before
 			  );
-#endif
+#endif /* FRIBIDI_H */

@@ -59,8 +59,8 @@
 //----------------------------------------------------------------------*/
 void
 fribidi_map_range(gint in_span[2],          /* Start and end span */
-		  gboolean is_v2l_map,      /* Needed for embedding_level */
 		  int len,
+		  gboolean is_v2l_map,      /* Needed for embedding_level */
 		  guint16 *position_map,
 		  guint8 *embedding_level_list,
 		  /* output */
@@ -310,7 +310,7 @@ void fribidi_xpos_resolve(gint x_pos,
 //  if the embedding level for the character is odd.
 //----------------------------------------------------------------------*/
 gboolean
-fribidi_is_char_rtl(gint8 *embedding_level_list,
+fribidi_is_char_rtl(guint8 *embedding_level_list,
 		    FriBidiCharType base_dir,
 		    int idx)
 {

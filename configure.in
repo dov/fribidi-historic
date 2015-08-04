@@ -1,21 +1,25 @@
 AC_INIT(README)
 
 PACKAGE=fribidi
-VERSION=0.1.9
+VERSION=0.1.10
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
 AM_CONFIG_HEADER(config.h)
 
-# Checks for programs.
+dnl Initialize libtool
+AM_PROG_LIBTOOL
+
+dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 
-# Check that glib exists by looking for glib.h
-AC_CHECK_HEADER(glib.h)
+AM_PATH_GLIB(1.2.0,,
+  AC_MSG_ERROR(Test for GLIB failed. See the file 'INSTALL' for help.))
 
 AC_OUTPUT([
 Makefile
-])
-
+fribidi-config
+],[case "$CONFIG_FILES" in
+*fribidi-config*)chmod +x fribidi-config;;
+esac])

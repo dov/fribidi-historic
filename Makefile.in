@@ -57,8 +57,18 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+host_alias = @host_alias@
+host_triplet = @host@
+AS = @AS@
 CC = @CC@
+DLLTOOL = @DLLTOOL@
+GLIB_CFLAGS = @GLIB_CFLAGS@
+GLIB_CONFIG = @GLIB_CONFIG@
+GLIB_LIBS = @GLIB_LIBS@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
+OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
@@ -68,9 +78,14 @@ CFLAGS = -g -Wall `glib-config --cflags`
 
 noinst_PROGRAMS = test_fribidi fribidi_benchmark
 
-lib_LIBRARIES = libfribidi.a
-libfribidi_a_SOURCES =  	fribidi.c	    	fribidi_tables.i    	fribidi_char_sets.c 	fribidi_get_type.c  	fribidi_utils.c
+INCLUDES = $(GLIB_CFLAGS)
 
+lib_LTLIBRARIES = libfribidi.la
+
+libfribidi_la_SOURCES =  	fribidi.c	    	fribidi_tables.i    	fribidi_char_sets.c 	fribidi_get_type.c  	fribidi_utils.c
+
+
+libfribidi_la_LIBADD = $(GLIB_LIBS)
 
 libfribidiincdir = $(includedir)/fribidi
 libfribidiinc_HEADERS =  	fribidi.h 	fribidi_char_sets.h 	fribidi_types.h
@@ -80,62 +95,67 @@ EXTRA_DIST =          CreateGetType.pl 	tests/test-hebrew 	tests/test-capital-rt
 
 
 test_fribidi_SOURCES = test_fribidi.c
-test_fribidi_LDADD = libfribidi.a 
+test_fribidi_LDADD = libfribidi.la $(GLIB_LIBS)
 
 fribidi_benchmark_SOURCES = fribidi_benchmark.c
-fribidi_benchmark_LDADD = libfribidi.a 
+fribidi_benchmark_LDADD = libfribidi.la $(GLIB_LIBS)
 
 bin_PROGRAMS = fribidi
 fribidi_SOURCES = fribidi_main.c
-fribidi_LDADD = libfribidi.a
+fribidi_LDADD = libfribidi.la $(GLIB_LIBS)
 
 TESTS = run.tests
+
+bin_SCRIPTS = fribidi-config
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = 
-LIBRARIES =  $(lib_LIBRARIES)
+CONFIG_CLEAN_FILES =  fribidi-config
+LTLIBRARIES =  $(lib_LTLIBRARIES)
 
 
 DEFS = @DEFS@ -I. -I$(srcdir) -I.
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
-libfribidi_a_LIBADD = 
-libfribidi_a_OBJECTS =  fribidi.o fribidi_char_sets.o fribidi_get_type.o \
-fribidi_utils.o
-AR = ar
+libfribidi_la_LDFLAGS = 
+libfribidi_la_DEPENDENCIES = 
+libfribidi_la_OBJECTS =  fribidi.lo fribidi_char_sets.lo \
+fribidi_get_type.lo fribidi_utils.lo
 PROGRAMS =  $(bin_PROGRAMS) $(noinst_PROGRAMS)
 
 fribidi_OBJECTS =  fribidi_main.o
-fribidi_DEPENDENCIES =  libfribidi.a
+fribidi_DEPENDENCIES =  libfribidi.la
 fribidi_LDFLAGS = 
 test_fribidi_OBJECTS =  test_fribidi.o
-test_fribidi_DEPENDENCIES =  libfribidi.a
+test_fribidi_DEPENDENCIES =  libfribidi.la
 test_fribidi_LDFLAGS = 
 fribidi_benchmark_OBJECTS =  fribidi_benchmark.o
-fribidi_benchmark_DEPENDENCIES =  libfribidi.a
+fribidi_benchmark_DEPENDENCIES =  libfribidi.la
 fribidi_benchmark_LDFLAGS = 
+SCRIPTS =  $(bin_SCRIPTS)
+
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 HEADERS =  $(libfribidiinc_HEADERS)
 
 DIST_COMMON =  README ./stamp-h.in AUTHORS COPYING ChangeLog INSTALL \
 Makefile.am Makefile.in NEWS THANKS TODO acconfig.h aclocal.m4 \
-config.guess config.h.in config.sub configure configure.in install-sh \
-ltmain.sh missing mkinstalldirs
+config.guess config.h.in config.sub configure configure.in \
+fribidi-config.in install-sh ltconfig ltmain.sh missing mkinstalldirs
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-SOURCES = $(libfribidi_a_SOURCES) $(fribidi_SOURCES) $(test_fribidi_SOURCES) $(fribidi_benchmark_SOURCES)
-OBJECTS = $(libfribidi_a_OBJECTS) $(fribidi_OBJECTS) $(test_fribidi_OBJECTS) $(fribidi_benchmark_OBJECTS)
+SOURCES = $(libfribidi_la_SOURCES) $(fribidi_SOURCES) $(test_fribidi_SOURCES) $(fribidi_benchmark_SOURCES)
+OBJECTS = $(libfribidi_la_OBJECTS) $(fribidi_OBJECTS) $(test_fribidi_OBJECTS) $(fribidi_benchmark_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .o .s
+.SUFFIXES: .S .c .lo .o .s
 $(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps Makefile
 
@@ -178,37 +198,32 @@ distclean-hdr:
 	-rm -f config.h
 
 maintainer-clean-hdr:
+fribidi-config: $(top_builddir)/config.status fribidi-config.in
+	cd $(top_builddir) && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-mostlyclean-libLIBRARIES:
+mostlyclean-libLTLIBRARIES:
 
-clean-libLIBRARIES:
-	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
+clean-libLTLIBRARIES:
+	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
 
-distclean-libLIBRARIES:
+distclean-libLTLIBRARIES:
 
-maintainer-clean-libLIBRARIES:
+maintainer-clean-libLTLIBRARIES:
 
-install-libLIBRARIES: $(lib_LIBRARIES)
+install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(libdir)
-	@list='$(lib_LIBRARIES)'; for p in $$list; do \
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p; \
-	  else :; fi; \
-	done
-	@$(POST_INSTALL)
-	@list='$(lib_LIBRARIES)'; for p in $$list; do \
-	  if test -f $$p; then \
-	    echo " $(RANLIB) $(DESTDIR)$(libdir)/$$p"; \
-	    $(RANLIB) $(DESTDIR)$(libdir)/$$p; \
+	    echo "$(LIBTOOL)  --mode=install $(INSTALL) $$p $(DESTDIR)$(libdir)/$$p"; \
+	    $(LIBTOOL)  --mode=install $(INSTALL) $$p $(DESTDIR)$(libdir)/$$p; \
 	  else :; fi; \
 	done
 
-uninstall-libLIBRARIES:
+uninstall-libLTLIBRARIES:
 	@$(NORMAL_UNINSTALL)
-	list='$(lib_LIBRARIES)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(libdir)/$$p; \
+	list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  $(LIBTOOL)  --mode=uninstall rm -f $(DESTDIR)$(libdir)/$$p; \
 	done
 
 .c.o:
@@ -230,10 +245,27 @@ distclean-compile:
 
 maintainer-clean-compile:
 
-libfribidi.a: $(libfribidi_a_OBJECTS) $(libfribidi_a_DEPENDENCIES)
-	-rm -f libfribidi.a
-	$(AR) cru libfribidi.a $(libfribidi_a_OBJECTS) $(libfribidi_a_LIBADD)
-	$(RANLIB) libfribidi.a
+.c.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+
+maintainer-clean-libtool:
+
+libfribidi.la: $(libfribidi_la_OBJECTS) $(libfribidi_la_DEPENDENCIES)
+	$(LINK) -rpath $(libdir) $(libfribidi_la_LDFLAGS) $(libfribidi_la_OBJECTS) $(libfribidi_la_LIBADD) $(LIBS)
 
 mostlyclean-binPROGRAMS:
 
@@ -249,8 +281,8 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
 	@list='$(bin_PROGRAMS)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo "  $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`"; \
-	     $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
+	    echo " $(LIBTOOL)  --mode=install $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`"; \
+	    $(LIBTOOL)  --mode=install $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed 's/$(EXEEXT)$$//'|sed '$(transform)'|sed 's/$$/$(EXEEXT)/'`; \
 	  else :; fi; \
 	done
 
@@ -280,6 +312,25 @@ test_fribidi: $(test_fribidi_OBJECTS) $(test_fribidi_DEPENDENCIES)
 fribidi_benchmark: $(fribidi_benchmark_OBJECTS) $(fribidi_benchmark_DEPENDENCIES)
 	@rm -f fribidi_benchmark
 	$(LINK) $(fribidi_benchmark_LDFLAGS) $(fribidi_benchmark_OBJECTS) $(fribidi_benchmark_LDADD) $(LIBS)
+
+install-binSCRIPTS: $(bin_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	@list='$(bin_SCRIPTS)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo " $(INSTALL_SCRIPT) $$p $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`"; \
+	    $(INSTALL_SCRIPT) $$p $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`; \
+	  else if test -f $(srcdir)/$$p; then \
+	    echo " $(INSTALL_SCRIPT) $(srcdir)/$$p $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`"; \
+	    $(INSTALL_SCRIPT) $(srcdir)/$$p $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; fi; \
+	done
+
+uninstall-binSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	list='$(bin_SCRIPTS)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`; \
+	done
 
 install-libfribidiincHEADERS: $(libfribidiinc_HEADERS)
 	@$(NORMAL_INSTALL)
@@ -367,24 +418,25 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-fribidi.o: fribidi.c fribidi.h fribidi_types.h fribidi_char_sets.h
+fribidi.lo fribidi.o : fribidi.c fribidi.h fribidi_types.h \
+	fribidi_char_sets.h
 fribidi_benchmark.o: fribidi_benchmark.c fribidi.h fribidi_types.h \
 	fribidi_char_sets.h
-fribidi_char_sets.o: fribidi_char_sets.c fribidi.h fribidi_types.h \
-	fribidi_char_sets.h
-fribidi_get_type.o: fribidi_get_type.c fribidi.h fribidi_types.h \
-	fribidi_char_sets.h fribidi_tables.i
+fribidi_char_sets.lo fribidi_char_sets.o : fribidi_char_sets.c fribidi.h \
+	fribidi_types.h fribidi_char_sets.h
+fribidi_get_type.lo fribidi_get_type.o : fribidi_get_type.c fribidi.h \
+	fribidi_types.h fribidi_char_sets.h fribidi_tables.i
 fribidi_main.o: fribidi_main.c fribidi.h fribidi_types.h \
 	fribidi_char_sets.h
-fribidi_utils.o: fribidi_utils.c fribidi.h fribidi_types.h \
-	fribidi_char_sets.h
+fribidi_utils.lo fribidi_utils.o : fribidi_utils.c fribidi.h \
+	fribidi_types.h fribidi_char_sets.h
 test_fribidi.o: test_fribidi.c fribidi.h fribidi_types.h \
 	fribidi_char_sets.h
 
@@ -425,7 +477,8 @@ installcheck: installcheck-am
 all-recursive-am: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
-install-exec-am: install-libLIBRARIES install-binPROGRAMS
+install-exec-am: install-libLTLIBRARIES install-binPROGRAMS \
+		install-binSCRIPTS
 install-exec: install-exec-am
 
 install-data-am: install-libfribidiincHEADERS
@@ -434,16 +487,17 @@ install-data: install-data-am
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-am
-uninstall-am: uninstall-libLIBRARIES uninstall-binPROGRAMS \
-		uninstall-libfribidiincHEADERS
+uninstall-am: uninstall-libLTLIBRARIES uninstall-binPROGRAMS \
+		uninstall-binSCRIPTS uninstall-libfribidiincHEADERS
 uninstall: uninstall-am
-all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(HEADERS) config.h
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS) $(HEADERS) \
+		config.h
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
 	$(mkinstalldirs)  $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) \
-		$(DESTDIR)$(libfribidiincdir)
+		$(DESTDIR)$(bindir) $(DESTDIR)$(libfribidiincdir)
 
 
 mostlyclean-generic:
@@ -455,28 +509,32 @@ distclean-generic:
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-mostlyclean-am:  mostlyclean-hdr mostlyclean-libLIBRARIES \
-		mostlyclean-compile mostlyclean-binPROGRAMS \
-		mostlyclean-noinstPROGRAMS mostlyclean-tags \
-		mostlyclean-generic
+mostlyclean-am:  mostlyclean-hdr mostlyclean-libLTLIBRARIES \
+		mostlyclean-compile mostlyclean-libtool \
+		mostlyclean-binPROGRAMS mostlyclean-noinstPROGRAMS \
+		mostlyclean-tags mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-hdr clean-libLIBRARIES clean-compile clean-binPROGRAMS \
-		clean-noinstPROGRAMS clean-tags clean-generic \
-		mostlyclean-am
+clean-am:  clean-hdr clean-libLTLIBRARIES clean-compile clean-libtool \
+		clean-binPROGRAMS clean-noinstPROGRAMS clean-tags \
+		clean-generic mostlyclean-am
 
 clean: clean-am
 
-distclean-am:  distclean-hdr distclean-libLIBRARIES distclean-compile \
-		distclean-binPROGRAMS distclean-noinstPROGRAMS \
-		distclean-tags distclean-generic clean-am
+distclean-am:  distclean-hdr distclean-libLTLIBRARIES distclean-compile \
+		distclean-libtool distclean-binPROGRAMS \
+		distclean-noinstPROGRAMS distclean-tags \
+		distclean-generic clean-am
+	-rm -f libtool
 
 distclean: distclean-am
 	-rm -f config.status
 
-maintainer-clean-am:  maintainer-clean-hdr maintainer-clean-libLIBRARIES \
-		maintainer-clean-compile maintainer-clean-binPROGRAMS \
+maintainer-clean-am:  maintainer-clean-hdr \
+		maintainer-clean-libLTLIBRARIES \
+		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-binPROGRAMS \
 		maintainer-clean-noinstPROGRAMS maintainer-clean-tags \
 		maintainer-clean-generic distclean-am
 	@echo "This command is intended for maintainers to use;"
@@ -486,14 +544,16 @@ maintainer-clean: maintainer-clean-am
 	-rm -f config.status
 
 .PHONY: mostlyclean-hdr distclean-hdr clean-hdr maintainer-clean-hdr \
-mostlyclean-libLIBRARIES distclean-libLIBRARIES clean-libLIBRARIES \
-maintainer-clean-libLIBRARIES uninstall-libLIBRARIES \
-install-libLIBRARIES mostlyclean-compile distclean-compile \
-clean-compile maintainer-clean-compile mostlyclean-binPROGRAMS \
-distclean-binPROGRAMS clean-binPROGRAMS maintainer-clean-binPROGRAMS \
-uninstall-binPROGRAMS install-binPROGRAMS mostlyclean-noinstPROGRAMS \
-distclean-noinstPROGRAMS clean-noinstPROGRAMS \
-maintainer-clean-noinstPROGRAMS uninstall-libfribidiincHEADERS \
+mostlyclean-libLTLIBRARIES distclean-libLTLIBRARIES \
+clean-libLTLIBRARIES maintainer-clean-libLTLIBRARIES \
+uninstall-libLTLIBRARIES install-libLTLIBRARIES mostlyclean-compile \
+distclean-compile clean-compile maintainer-clean-compile \
+mostlyclean-libtool distclean-libtool clean-libtool \
+maintainer-clean-libtool mostlyclean-binPROGRAMS distclean-binPROGRAMS \
+clean-binPROGRAMS maintainer-clean-binPROGRAMS uninstall-binPROGRAMS \
+install-binPROGRAMS mostlyclean-noinstPROGRAMS distclean-noinstPROGRAMS \
+clean-noinstPROGRAMS maintainer-clean-noinstPROGRAMS \
+uninstall-binSCRIPTS install-binSCRIPTS uninstall-libfribidiincHEADERS \
 install-libfribidiincHEADERS tags mostlyclean-tags distclean-tags \
 clean-tags maintainer-clean-tags distdir check-TESTS info-am info \
 dvi-am dvi check check-am installcheck-am installcheck all-recursive-am \

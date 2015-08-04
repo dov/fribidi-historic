@@ -49,7 +49,7 @@ accordance with the Unicode specification. The same is true for the
 mirroring of characters, which also works for all the characters
 listed as mirrorable in the the Unicode specification.
 
-Other character sets must be converted into Unicode bofore the library
+Other character sets must be converted into Unicode before the library
 may be used. In order to use e.g. iso8859-8, the function
 
      void

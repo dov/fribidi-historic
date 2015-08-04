@@ -19,14 +19,41 @@
 #ifndef FRIBIDI_CHAR_SETS_H
 #define FRIBIDI_CHAR_SETS_H
 
+#define FRIBIDI_CHARSET_UTF8		   1
+#define FRIBIDI_CHARSET_8859_6		   6
+#define FRIBIDI_CHARSET_8859_8		   8
+#define FRIBIDI_CHARSET_CP1255		1255
+#define FRIBIDI_CHARSET_CP1256		1256
+#define FRIBIDI_CHARSET_ISIRI_3342	3342
+
 #include "fribidi.h"
 
-FriBidiChar     fribidi_iso8859_8_to_unicode_c     (guchar ch);
-void            fribidi_iso8859_8_to_unicode       (guchar *s,
+FriBidiChar     fribidi_cp1255_to_unicode_c        (guchar ch);
+void            fribidi_cp1255_to_unicode          (guchar *s,
 						    /* Output */
 						    FriBidiChar *us);
-guchar          fribidi_unicode_to_iso8859_8_c     (FriBidiChar uch);
-void            fribidi_unicode_to_iso8859_8       (FriBidiChar *us,
+guchar          fribidi_unicode_to_cp1255_c        (FriBidiChar uch);
+void            fribidi_unicode_to_cp1255          (FriBidiChar *us,
+						    int length,
+						    /* Output */
+						    guchar *s);
+
+FriBidiChar     fribidi_cp1256_to_unicode_c        (guchar ch);
+void            fribidi_cp1256_to_unicode          (guchar *s,
+						    /* Output */
+						    FriBidiChar *us);
+guchar          fribidi_unicode_to_cp1256_c        (FriBidiChar uch);
+void            fribidi_unicode_to_cp1256          (FriBidiChar *us,
+						    int length,
+						    /* Output */
+						    guchar *s);
+
+FriBidiChar     fribidi_isiri_3342_to_unicode_c    (guchar ch);
+void            fribidi_isiri_3342_to_unicode      (guchar *s,
+						    /* Output */
+						    FriBidiChar *us);
+guchar          fribidi_unicode_to_isiri_3342_c    (FriBidiChar uch);
+void            fribidi_unicode_to_isiri_3342      (FriBidiChar *us,
 						    int length,
 						    /* Output */
 						    guchar *s);
@@ -41,15 +68,26 @@ void            fribidi_unicode_to_iso8859_6       (FriBidiChar *us,
 						    /* Output */
 						    guchar *s);
 
+FriBidiChar     fribidi_iso8859_8_to_unicode_c     (guchar ch);
+void            fribidi_iso8859_8_to_unicode       (guchar *s,
+						    /* Output */
+						    FriBidiChar *us);
+guchar          fribidi_unicode_to_iso8859_8_c     (FriBidiChar uch);
+void            fribidi_unicode_to_iso8859_8       (FriBidiChar *us,
+						    int length,
+						    /* Output */
+						    guchar *s);
 
-void                  fribidi_unicode_to_utf8                         (FriBidiChar *us,
-                                                       int length,
-                                                       /* Output */
-                                                       guchar *s);
+
+void            fribidi_unicode_to_utf8             (FriBidiChar *us,
+                                                     int length,
+                                                     /* Output */
+                                                     guchar *s);
 /* warning: the length of output string may exceed the length of the input */
 
-int                           fribidi_utf8_to_unicode                         (guchar *s,
-                                                       /* Output */
-                                                       FriBidiChar *us);
+int             fribidi_utf8_to_unicode             (guchar *s,
+                                                     /* Output */
+                                                     FriBidiChar *us);
 /* the length of the string is returned */
+
 #endif

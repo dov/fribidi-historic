@@ -66,11 +66,19 @@ void charset_to_unicode(gint char_set,
 	    us[i] = s[i];
 	}
     }
-  else if (char_set == 6)
+  else if (char_set == FRIBIDI_CHARSET_8859_6)
       fribidi_iso8859_6_to_unicode(s, us);
-  else if (char_set == 8)
+  else if (char_set == FRIBIDI_CHARSET_8859_8)
       fribidi_iso8859_8_to_unicode(s, us);
-  else if (char_set == 1)
+  else if (char_set == FRIBIDI_CHARSET_8859_6)
+      fribidi_iso8859_6_to_unicode(s, us);
+  else if (char_set == FRIBIDI_CHARSET_ISIRI_3342)
+      fribidi_isiri_3342_to_unicode(s, us);
+  else if (char_set == FRIBIDI_CHARSET_CP1255)
+      fribidi_cp1255_to_unicode(s, us);
+  else if (char_set == FRIBIDI_CHARSET_CP1256)
+      fribidi_cp1256_to_unicode(s, us);
+  else if (char_set == FRIBIDI_CHARSET_UTF8)
       *length = fribidi_utf8_to_unicode(s, us);
   else
     die("Sorry! Not implemented!\n");
@@ -100,11 +108,17 @@ void unicode_to_charset(gint char_set,
 	}
       s[i] = 0;
     }
-  else if (char_set == 6)
+  else if (char_set == FRIBIDI_CHARSET_8859_6)
     fribidi_unicode_to_iso8859_6(us, length, s); 
-  else if (char_set == 8)
+  else if (char_set == FRIBIDI_CHARSET_8859_8)
     fribidi_unicode_to_iso8859_8(us, length, s);
-  else if (char_set == 1)
+  else if (char_set == FRIBIDI_CHARSET_ISIRI_3342)
+    fribidi_unicode_to_isiri_3342(us, length, s);
+  else if (char_set == FRIBIDI_CHARSET_CP1255)
+    fribidi_unicode_to_cp1255(us, length, s);
+  else if (char_set == FRIBIDI_CHARSET_CP1256)
+    fribidi_unicode_to_cp1256(us, length, s);
+  else if (char_set == FRIBIDI_CHARSET_UTF8)
       (void) fribidi_unicode_to_utf8(us, length, s);
   else
     die("Sorry! Not implemented!\n");
@@ -144,6 +158,9 @@ int main(int argc, char *argv[])
 		 "    -charset cs  Specify charset. Default is CapRTL. Available options are:\n"
 		 "                     * 8859-8 (Hebrew)\n"
 		 "                     * 8859-6 (Arabic)\n"
+		 "                     * CP1255 (Hebrew/Yiddish)\n"
+		 "                     * CP1256 (MS-Arabic)\n"
+		 "                     * ISIRI-3342 (Farsi)\n"
                  "                     * UTF-8\n"
 
 		 );
@@ -161,9 +178,12 @@ int main(int argc, char *argv[])
 	{
 	  gchar *S_ = argv[argp++];
 	  while(1) {
-	    CASE("8859-8") { char_set = 8; break; }
-	    CASE("8859-6") { char_set = 6; break; }
-            CASE("UTF-8")  { char_set = 1; break; }
+	    CASE("CP1255") { char_set = FRIBIDI_CHARSET_CP1255; break; }
+	    CASE("CP1256") { char_set = FRIBIDI_CHARSET_CP1256; break; }
+	    CASE("8859-6") { char_set = FRIBIDI_CHARSET_8859_8; break; }
+	    CASE("8859-8") { char_set = FRIBIDI_CHARSET_8859_8; break; }
+	    CASE("ISIRI-3342") { char_set = FRIBIDI_CHARSET_ISIRI_3342; break;}
+            CASE("UTF-8")  { char_set = FRIBIDI_CHARSET_UTF8; break; }
 	    die("Unknown char set %s!\n", S_);
 	  }
 	  continue;

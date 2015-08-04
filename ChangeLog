@@ -1,3 +1,15 @@
+1999-04-28  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Fixed bug in fribidi_log2vis which occured if only the v2l
+	  array was requested and not the l2v array.
+
+	* Fixed bug in test_fribidi when using option test_vtol .
+
+	* Changed types in call to fribidi_log2vis to be more memory 
+	  conservative. 
+
+	* Added single character translation functions to fribidi_char_sets.
+
 1999-04-10  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
 
 	* Changed building to use glib-config as glib-1.2 is now released.
@@ -16,7 +28,7 @@
 
 	* Added length paramater to fribidi_unicode_to_iso8859_8().
 
-	* Fixed bug in fribid.c related to zero length strings.
+	* Fixed bug in fribidi.c related to zero length strings.
 
 	* Released 1.1.2.
 

@@ -38,13 +38,13 @@ fribidi_set_debug(gboolean debug);
 
 void fribidi_log2vis(/* input */
 		     FriBidiChar *str,
-		     int len,
+		     gint len,
 		     FriBidiCharType *pbase_dir,
 		     /* output */
 		     FriBidiChar *visual_str,
-		     gint        *position_L_to_V_list,
-		     gint        *position_V_to_L_list,
-		     gint8       *embedding_level_list
+		     guint16     *position_L_to_V_list,
+		     guint16     *position_V_to_L_list,
+		     guint8      *embedding_level_list
 		     );
 
 void fribidi_log2vis_get_embedding_levels(
@@ -53,7 +53,7 @@ void fribidi_log2vis_get_embedding_levels(
 		     int len,
 		     FriBidiCharType *pbase_dir,
 		     /* output */
-		     gint8 *embedding_level_list
+		     guint8 *embedding_level_list
 		     );
 
 void

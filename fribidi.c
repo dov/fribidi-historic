@@ -64,7 +64,8 @@ static void bidi_string_reverse(FriBidiChar *str, gint len)
     }
 }
 
-static void int_array_reverse(gint *arr, gint len)
+static void
+int16_array_reverse(gint16 *arr, gint len)
 {
   int i;
   for (i=0; i<len/2; i++)
@@ -599,18 +600,32 @@ fribidi_analyse_string(/* input */
 //----------------------------------------------------------------------*/
 void fribidi_log2vis(/* input */
 		     FriBidiChar *str,
-		     int len,
+		     gint len,
 		     FriBidiCharType *pbase_dir,
 		     /* output */
 		     FriBidiChar *visual_str,
-		     gint        *position_L_to_V_list,
-		     gint        *position_V_to_L_list,
-		     gint8       *embedding_level_list
+		     guint16     *position_L_to_V_list,
+		     guint16     *position_V_to_L_list,
+		     guint8      *embedding_level_list
 		     )
 {
   GList *type_rl_list, *pp;
   int max_level;
-  
+  gboolean private_L_to_V = FALSE;
+
+  /* If v2l is to be calculated we must have l2v as well. If it is not
+     given by the caller, we have to make a private instance of it. */
+  if (position_V_to_L_list && !position_L_to_V_list)
+    {
+      private_L_to_V++;
+      position_L_to_V_list = g_new(guint16, len+1);
+    }
+
+  if (len > (2L<<16)-1)
+    {
+      fprintf(stderr, "Fribidi can't handle strings > 65000 chars!\n");
+      return;
+    }
   fribidi_analyse_string(str, len, pbase_dir,
 			 /* output */
 			 &type_rl_list,
@@ -687,7 +702,7 @@ void fribidi_log2vis(/* input */
 		    if (visual_str)
 		      bidi_string_reverse(visual_str+pos, len);
 		    if (position_L_to_V_list)
-		      int_array_reverse(position_L_to_V_list+pos, len);
+		      int16_array_reverse(position_L_to_V_list+pos, len);
 
 		  }
 	      }
@@ -702,6 +717,10 @@ void fribidi_log2vis(/* input */
 
   /* Free up the rl_list */
   g_list_free(type_rl_list);
+
+  /* Free up L_to_V if we allocated it */
+  if (private_L_to_V)
+    g_free(position_L_to_V_list);
   
 }
 
@@ -715,7 +734,7 @@ void fribidi_log2vis_get_embedding_levels(
 		     int len,
 		     FriBidiCharType *pbase_dir,
 		     /* output */
-		     gint8 *embedding_level_list
+		     guint8 *embedding_level_list
 		     )
 {
   GList *type_rl_list, *pp;

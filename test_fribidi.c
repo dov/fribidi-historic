@@ -88,9 +88,9 @@ int main(int argc, char *argv[])
   while(fgets(S_, sizeof(S_), IN))
     {
       FriBidiChar out_us[255];
-      gint positionLtoV[255], positionVtoL[255];
+      guint16 positionLtoV[255], positionVtoL[255];
       guchar outstring[255];
-      gint8 embedding_list[255];
+      guint8 embedding_list[255];
       FriBidiCharType base;
       int i;
 
@@ -160,14 +160,14 @@ int main(int argc, char *argv[])
 	  int i;
 	    
 	  for (i=0; i<len; i++)
-	    printf("%c", S_[positionLtoV[i]]);
+	    /* printf("%c", S_[positionLtoV[i]]); */
+	    printf("%d ", positionLtoV[i]); 
 	}
       else if (do_test_vtol)
 	{
-	  if (base == FRIBIDI_TYPE_R)
-	    
 	  for (i=0; i<len; i++)
-	    printf("%c", outstring[positionVtoL[i]]);
+	    /* printf("%c", outstring[positionVtoL[i]]); */
+	    printf("%d ", positionVtoL[i]); 
 	}
       else
 	{

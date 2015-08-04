@@ -21,14 +21,14 @@
 
 #include "fribidi.h"
 
-void
-fribidi_iso8859_8_to_unicode(guchar *s,
-			     /* Output */
-			     FriBidiChar *us);
-void
-fribidi_unicode_to_iso8859_8(FriBidiChar *us,
-			     int length,
-			     /* Output */
-			     guchar *s);
+FriBidiChar     fribidi_iso8859_8_to_unicode_c     (guchar ch);
+void            fribidi_iso8859_8_to_unicode       (guchar *s,
+						    /* Output */
+						    FriBidiChar *us);
+guchar          fribidi_unicode_to_iso8859_8_c     (FriBidiChar uch);
+void            fribidi_unicode_to_iso8859_8       (FriBidiChar *us,
+						    int length,
+						    /* Output */
+						    guchar *s);
 
 #endif

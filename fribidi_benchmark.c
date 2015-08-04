@@ -39,8 +39,8 @@ int main(int argc, char *argv[])
   FriBidiChar us[255];
   int len;
   FriBidiChar out_us[255];
-  gint positionLtoV[255], positionVtoL[255];
-  gint8 embedding_list[255];
+  guint16 positionLtoV[255], positionVtoL[255];
+  guint8 embedding_list[255];
   FriBidiCharType base;
   int i;
   int niter = 1000;

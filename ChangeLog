@@ -1,4 +1,17 @@
+2000-10-14  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Released fribidi-0.1.14.
+
+	* CreateGetType.pl, fribidi_tables.i: Applied a patch received
+ 	from Roozbeh Pournader <roozbeh@sina.sharif.ac.ir> (who has got
+ 	quite some courage sending an email from Iran to Israel) which
+	updates the character tables according to UnicodeData-3.0.1.txt .
+
+	* fribidi_char_sets.c: Cleaned up the mess and made it compile!
+
 2000-10-09  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Released fribidi-0.1.13 .
 
 	* acinclude.m4: Added file including a m4 macro for glib-2.0
 	as suggested by Owen Taylor.

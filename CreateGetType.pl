@@ -28,7 +28,7 @@
 
 use strict;
 
-my $unicode_version = "3.0";
+my $unicode_version = "3.0.1";
 my $unicode_data_file = "UnicodeData-$unicode_version.txt";
 my $unicode_proplist_file = "PropList-$unicode_version.txt";
 my @bidi_entities;

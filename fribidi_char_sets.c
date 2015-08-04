@@ -22,13 +22,13 @@
 #define ISO_TAV 250
 
 /* The following are proposed extensions to iso-8859-8. */
-#define ISO_8_LRM 253
-#define ISO_8_RLM 254
-#define ISO_8_LRE 251
-#define ISO_8_RLE 252
-#define ISO_8_PDF 221
-#define ISO_8_LRO 219
-#define ISO_8_RLO 220
+#define ISO_8859_8_LRM 253
+#define ISO_8859_8_RLM 254
+#define ISO_8859_8_LRE 251
+#define ISO_8859_8_RLE 252
+#define ISO_8859_8_PDF 221
+#define ISO_8859_8_LRO 219
+#define ISO_8859_8_RLO 220
 
 #define UNI_ALEF 0x05D0
 #define UNI_TAV 0x05EA
@@ -61,22 +61,41 @@ FriBidiChar
 fribidi_iso8859_8_to_unicode_c(guchar ch)
 {
   /* optimization */
-  if (ch < ISO_8_LRO)
+  if (ch < ISO_8859_8_LRO)
     return ch;
   else if (ch >= ISO_ALEF && ch <= ISO_TAV)
     return ch-ISO_ALEF+UNI_ALEF;
-  else if (ch == ISO_RLM) return UNI_RLM)
+  switch(ch)
+    {
+    case ISO_8859_8_RLM: return UNI_RLM;
+    case ISO_8859_8_LRM: return UNI_LRM;
+    case ISO_8859_8_RLO: return UNI_RLO;
+    case ISO_8859_8_LRO: return UNI_LRO;
+    case ISO_8859_8_RLE: return UNI_RLE;
+    case ISO_8859_8_LRE: return UNI_LRE;
+    case ISO_8859_8_PDF: return UNI_PDF;
+    default:
+      return '?';      /* This shouldn't happen! */
+    }
+}
 
-  if (ch >= ISO_8_LRM) {
-    if (ch > ISO_8_LRM)
-      return UNI_RLM;
-    else
-      return UNI_LRM;
+guchar
+fribidi_unicode_to_iso8859_8_c(FriBidiChar uch)
+{
+  if (uch<128)
+    return uch;
+  if (uch >= UNI_ALEF && uch <= UNI_TAV)
+    return (guchar)(uch-UNI_ALEF+ISO_ALEF);
+  switch (uch) {
+    case UNI_RLM: return ISO_8859_8_RLM;
+    case UNI_LRM: return ISO_8859_8_LRM;
+    case UNI_RLO: return ISO_8859_8_RLO;
+    case UNI_LRO: return ISO_8859_8_LRO;
+    case UNI_RLE: return ISO_8859_8_RLE;
+    case UNI_LRE: return ISO_8859_8_LRE;
+    case UNI_PDF: return ISO_8859_8_PDF;
   }
-  else if (ch >= ISO_ALEF && ch <= ISO_TAV)
-    return ch-ISO_ALEF+UNI_ALEF;
-  else
-    return ch;
+  return '¿';
 }
 
 FriBidiChar
@@ -247,21 +266,6 @@ fribidi_unicode_to_iso8859_6_c(FriBidiChar uch)
     return '¿';
 }
 
-guchar
-fribidi_unicode_to_iso8859_8_c(FriBidiChar uch)
-{
-  if (uch >= UNI_ALEF && uch <= UNI_TAV)
-    return (guchar)(uch-UNI_ALEF+ISO_ALEF);
-  if (uch == UNI_RLM)
-    return ISO_8_RLM;
-  if (uch == UNI_LRM)
-    return ISO_8_LRM;
-  /* TODO: handle pre-composed and presentation chars */
-  else if (uch < 256)
-    return (guchar)uch;
-  else
-    return '¿';
-}
 
 guchar
 fribidi_unicode_to_cp1255_c(FriBidiChar uch)

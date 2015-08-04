@@ -27,6 +27,7 @@ fribidi_iso8859_8_to_unicode(guchar *s,
 			     FriBidiChar *us);
 void
 fribidi_unicode_to_iso8859_8(FriBidiChar *us,
+			     int length,
 			     /* Output */
 			     guchar *s);
 

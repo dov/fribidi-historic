@@ -42,12 +42,13 @@ fribidi_iso8859_8_to_unicode(guchar *s,
 
 void
 fribidi_unicode_to_iso8859_8(FriBidiChar *us,
+			     int length,
 			     guchar *s)
 		     
 {
-  int i = 0;
-
-  while(us[i])
+  int i;
+  
+  for (i=0; i< length; i++)
     {
       FriBidiChar ch = us[i];
       if (ch >= UNI_ALEF && ch <= UNI_TAV)
@@ -56,7 +57,6 @@ fribidi_unicode_to_iso8859_8(FriBidiChar *us,
 	s[i] = us[i];
       else
 	s[i] = '¿';
-      i++;
     }
   s[i] = 0;
 }

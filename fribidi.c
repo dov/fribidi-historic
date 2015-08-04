@@ -106,7 +106,7 @@ static GList *run_length_encode_types(int *char_type, int type_len)
   pos = -1;
   for (i=0; i<=type_len; i++)
     {
-      if (char_type[i] != type || i==type_len)
+      if (i==type_len || char_type[i] != type)
 	{
 	  if (pos>=0)
 	    {

@@ -72,6 +72,7 @@ void charset_to_unicode(gint char_set,
 
 void unicode_to_charset(gint char_set,
 			FriBidiChar *us,
+			int length,
 			/* output */
 			gchar *s)
 {
@@ -94,7 +95,7 @@ void unicode_to_charset(gint char_set,
       s[i] = 0;
     }
   else if (char_set == 8)
-    fribidi_unicode_to_iso8859_8(us, s);
+    fribidi_unicode_to_iso8859_8(us, length, s);
   else
     die("Sorry! Not implemented!\n");
 }
@@ -205,7 +206,7 @@ int main(int argc, char *argv[])
 			);
 
 	/* Convert it to something to print */
-	unicode_to_charset(char_set, out_us, outstring);
+	unicode_to_charset(char_set, out_us, len, outstring);
 
 	if (bol_text)
 	  printf("%s", bol_text);

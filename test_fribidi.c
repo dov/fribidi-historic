@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 	}
       
       /* Convert it to something to print */
-      fribidi_unicode_to_iso8859_8(out_us, outstring);
+      fribidi_unicode_to_iso8859_8(out_us, len, outstring);
 
       if (do_cap_as_rtl)
 	for (i=0; i<len; i++)

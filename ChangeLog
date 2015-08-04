@@ -1,5 +1,13 @@
 1999-02-08  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
 
+	* Released 1.1.3 to match the perl module FriBidi.
+
+	* Added length paramater to fribidi_unicode_to_iso8859_8().
+
+	* Fixed bug in fribid.c related to zero length strings.
+
+	* Released 1.1.2.
+
 	* Added options -ltr and -rtl to fribidi to force LTR and RTL 
 	  directions.
 

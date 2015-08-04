@@ -1,0 +1,15 @@
+* Implement the rule that changes european numbers to arabic numbers.
+
+* Clean up code
+
+* Support LRE, RLE, RLO and LRO.
+
+* Optimize binary searches.
+
+* Documentation
+
+* Write some utility programs.
+
+* Is it worthwile to make the library shared? Comments?
+
+* Write a web page about this library.

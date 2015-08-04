@@ -1,0 +1,23 @@
+AC_INIT(README)
+
+PACKAGE=fribidi
+VERSION=0.1.0
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+
+AM_CONFIG_HEADER(config.h)
+
+# Checks for programs.
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+
+dnl Initialize libtool
+AM_PROG_LIBTOOL
+
+# Check that glib exists by looking for glib.h
+AC_CHECK_HEADER(glib.h)
+
+AC_OUTPUT([
+Makefile
+])
+

@@ -1,0 +1,112 @@
+This is is FriBidi, a Free Implementation of the Unicode BiDi algorithm.
+
+Background
+==========
+One of the missing links stopping the penetration of free software in
+Israel is the lack of support for Hebrew. In order to have proper
+Hebrew support, the BiDi algorithm must be implemented. It is my hope
+that this library will stimulate more Hebrew free software.
+
+Of course the BiDi algorithm is not limited to Hebrew, so I expect 
+that our Arab neighbors will also find this software useful.
+
+Audience
+========
+It is my hope that this library will stimulate the implementation of
+Hebrew in lots of free software. Here is a small list of projects that
+would benifit from the use of the fribidi library, but of course there
+are many more: Wine, Mozilla, Gtk, AbiWord.
+
+Downloading
+===========
+The latest version of FriBidi may be found at:
+
+   http://imagic.weizmann.ac.il/~dov/freesw/FriBidi
+
+Building
+========
+See INSTALL for a description of how to build and install this library.
+
+Implementation
+==============
+The library implements almost all of the algorithm as described in the
+"Unicode Bidirectional Algorithm, Working Draft Unicode Technical Report
+#9, http://www.unicode.org/unicode/reports/tr9/". For more details
+about what parts are missing see the TODO file.
+
+In the API I was was inspired by the document "Bi-Di languages support
+- BiDi API propasal" by Franck Portaneri <franck@langbox.com> which 
+he wrote as a proposal for adding BiDi support to Mozilla.
+
+Internally the library uses Unicode entirely. The character property
+function was automatically created from the Unicode property list
+document PropList-2.1.8.txt available from the Unicode ftp site. This
+which means that every Unicode character should be treated in strict
+accordance with the Unicode specification. The same is true for the
+mirroring of characters, which also works for all the characters
+listed as mirrorable in the the unicode specification.
+
+Other character sets must be converted into Unicode bofore the library
+is used. In order to use e.g. iso8859-8, the function
+
+     void
+     fribidi_iso8859_8_to_unicode(guchar *s,
+             	                  /* output */
+	    	                  FriBidiChar *us)
+
+must be called which translates the guchar string *s to a unicode 
+string. There is also a corresponding fribidi_unicode_to_iso8859_8
+that may be called to convert the string back to iso8859_8 for output.
+
+The reordering of characters is done through the function:
+
+    void
+    fribidi_log2vis(/* input */
+		    FriBidiChar *str, 
+		    int *pbase_dir,
+		    /* output */
+		    FriBidiChar *visual_str,
+		    gint *positionLtoV,
+		    gint *positionVtoL
+		    );
+    
+
+where
+     us            is the Unicode input string
+     base          is the input and output base direction. If base == 
+                   FRIBIDI_TYPE_N then the fribidi_log2vis determins the 
+                   base direction according to the BiDi algorithm.
+     out_us        The reordered output unicode string.
+     positionLtoV  Maps the positions in the logical string to positions
+                   in the visual string.
+     positionVtoL  Maps the positions in the visual string to positions 
+                   in the logical string.
+
+A test program test_fribidi has been written to test out the algorithm.
+test_fribidi currently works on iso8859-8 by default, but by adding
+the flag -capital_rtl it treats capital letters as RTL, as is done
+in the Unicode specification. Please use this program as a reference
+of how to use this library.
+     
+How it looks like
+=================
+
+Here is the output of 
+    ./test_fribidi -capital_rtl tests/test-capital-rtl
+
+car is THE CAR in arabic            => car is RAC EHT in arabic           
+CAR IS the car IN ENGLISH           =>           HSILGNE NI the car SI RAC
+he said "IT IS 123, 456, OK"        => he said "KO ,456 ,123 SI TI"       
+he said "IT IS (123, 456), OK"      => he said "KO ,(456 ,123) SI TI"     
+he said "IT IS 123,456, OK"         => he said "KO ,123,456 SI TI"        
+he said "IT IS (123,456), OK"       => he said "KO ,(123,456) SI TI"      
+HE SAID "it is 123, 456, ok"        =>        "it is 123, 456, ok" DIAS EH
+<H123>shalom</H123>                 =>                 <123H/>shalom<123H>
+<h123>SAALAM</h123>                 => <h123>MALAAS</h123>                
+HE SAID "it is a car!" AND RAN      =>      NAR DNA "!it is a car" DIAS EH
+HE SAID "it is a car!x" AND RAN     =>     NAR DNA "it is a car!x" DIAS EH
+
+Bugs and comments
+=================
+Send bug reports and comments about FriBidi to dov@imagic.weizmann.ac.il.
+

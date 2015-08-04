@@ -1,0 +1,13 @@
+# A test with capital letters treated as RTL
+car is THE CAR in arabic
+CAR IS the car IN ENGLISH
+he said "IT IS 123, 456, OK"
+he said "IT IS (123, 456), OK"
+he said "IT IS 123,456, OK"
+he said "IT IS (123,456), OK"
+HE SAID "it is 123, 456, ok"
+<H123>shalom</H123>
+<h123>SAALAM</h123>
+HE SAID "it is a car!" AND RAN
+HE SAID "it is a car!x" AND RAN
+

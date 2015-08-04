@@ -29,10 +29,6 @@ fribidi_get_mirror_char(/* Input */
 			FriBidiChar ch,
 			/* Output */
 			FriBidiChar *mirrored_ch);
-gboolean
-fribidi_is_arabic_strong(/* Input */
-			 FriBidiChar ch);
-
 void
 fribidi_set_debug(gboolean debug);
 

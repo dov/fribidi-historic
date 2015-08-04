@@ -1,6 +1,33 @@
+2000-05-19  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* fribidi_char_sets.c: Added support for the LRM and RLM 
+	characters for the iso-8859-8 converts at unused positions 
+	0xFE and 0xFF . 
+
+	* CreateGetType.PL, fribidi.c, fribidi_tables.i, fribidi_types.h:
+ 	Updated the algorithms to be consistance with the latest Unicode
+ 	Technical Report #9 release. Still no explicit overrides, but
+ 	hopefully the implicit algorithm now works according to the
+ 	specification.
+
+	* CreateGetType.PL, fribidi_tables.i: Overwrote the character
+ 	bidi-assignment of all non-assigned characters within blocks with
+ 	the property of the previous character in order to create a few
+ 	more reused secondary lookup character tables.
+
+	* CreateGetType.PL, fribidi.c, fribidi_tables.i: Added Owen
+ 	Taylor's speed patch that speeds up fribidi by a factor of 4!
+  	Owen's patch consists of two parts. The first part is a double
+ 	table lookup scheme for accessing the character properties,
+ 	replacing the old binary search. The second part is a reuse of the
+ 	links in the character properties linked list in order to minimize
+ 	mallocs.
+
 2000-05-02  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
 
-	* Fixed one remaining bug in Mkaefile.am.
+	* Released fribidi-0.1.11 .
+
+	* Fixed one remaining bug in Makefile.am.
 
 2000-04-27  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
 

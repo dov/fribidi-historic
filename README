@@ -34,7 +34,7 @@ Implementation
 The library implements most of the algorithm as described in the
 "Unicode Bidirectional Algorithm, Working Draft Unicode Technical Report
 #9, http://www.unicode.org/unicode/reports/tr9/". The major feature
-that is currently missing is the support for explicit overrides.
+that is currently missing in fribidi is the support for explicit overrides.
 
 In the API I was was inspired by the document "Bi-Di languages support
 - BiDi API propasal", http://www.langbox.com/AraMosaic/mozilla/BiDi_API.html,
@@ -43,7 +43,7 @@ for adding BiDi support to Mozilla.
 
 Internally the library uses Unicode entirely. The character property
 function was automatically created from the Unicode property list
-document PropList-2.1.8.txt available from the Unicode ftp site. This
+document PropList.txt available from the Unicode ftp site. This
 means that every Unicode character should be treated in strict
 accordance with the Unicode specification. The same is true for the
 mirroring of characters, which also works for all the characters

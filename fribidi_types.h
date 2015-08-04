@@ -23,6 +23,7 @@
 
 typedef guint32 FriBidiChar;
 
+#if 0
 /* Classifications of the various Bidi properties */
 typedef enum
 {
@@ -50,6 +51,43 @@ typedef enum
   FRIBIDI_TYPE_EOT = 0xF4000000, 
   FRIBIDI_TYPE_N   = 0xF5000000, 
   FRIBIDI_TYPE_E   = 0xF6000000, 
+} FriBidiCharType;
+#endif
+
+typedef enum
+{
+  FRIBIDI_TYPE_LTR , /* Strong left to right */
+  FRIBIDI_TYPE_RTL , /* Right to left characters */
+  FRIBIDI_TYPE_WL  , /* Weak left to right */
+  FRIBIDI_TYPE_WR  , /* Weak right to left */
+  FRIBIDI_TYPE_EN  , /* European digit */
+  FRIBIDI_TYPE_ES  , /* European number separator */
+  FRIBIDI_TYPE_ET  , /* European number terminator */
+  FRIBIDI_TYPE_AN  , /* Arabic digit */
+  FRIBIDI_TYPE_CS  , /* Common Separator */
+  FRIBIDI_TYPE_BS  , /* Block separator */
+  FRIBIDI_TYPE_SS  , /* Segment separator */
+  FRIBIDI_TYPE_WS  , /* Whitespace */
+  FRIBIDI_TYPE_AL  , /* Arabic characters */
+  FRIBIDI_TYPE_NSM , /* Non spacing mark */
+  FRIBIDI_TYPE_LRE , /* Left-To-Right embedding */
+  FRIBIDI_TYPE_RLE , /* Right-To-Left embedding */
+  FRIBIDI_TYPE_LRO , /* Left-To-Right override */
+  FRIBIDI_TYPE_RLO , /* Right-To-Left override */
+  FRIBIDI_TYPE_PDF , /* Pop directional override */
+  FRIBIDI_TYPE_ON  ,  /* Other Neutral */
+
+  /* The following are only used internally */
+  FRIBIDI_TYPE_L = FRIBIDI_TYPE_LTR, 
+  FRIBIDI_TYPE_R = FRIBIDI_TYPE_RTL, 
+  FRIBIDI_TYPE_BN  = FRIBIDI_TYPE_ON + 2, 
+  FRIBIDI_TYPE_CM  , 
+  FRIBIDI_TYPE_SOT , 
+  FRIBIDI_TYPE_EOT , 
+  FRIBIDI_TYPE_N   , 
+  FRIBIDI_TYPE_E   , 
+  FRIBIDI_TYPE_CTL , /* Control units */
+  FRIBIDI_TYPE_EO , /* Control units */
 } FriBidiCharType;
 
 /* The following type is used by fribidi_utils */

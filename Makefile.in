@@ -563,10 +563,10 @@ maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
 test.reference : tests/test-capital-rtl
-	test_fribidi -capital_rtl tests/test-capital-rtl > test.reference
+	./test_fribidi -capital_rtl tests/test-capital-rtl > test.reference
 
 test : 	test_fribidi 
-	test_fribidi -capital_rtl tests/test-capital-rtl
+	./test_fribidi -capital_rtl tests/test-capital-rtl
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

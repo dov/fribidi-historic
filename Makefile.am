@@ -40,10 +40,10 @@ fribidi_SOURCES = fribidi_main.c
 fribidi_LDADD = libfribidi.la $(GLIB_LIBS)
 
 test.reference : tests/test-capital-rtl
-	test_fribidi -capital_rtl tests/test-capital-rtl > test.reference
+	./test_fribidi -capital_rtl tests/test-capital-rtl > test.reference
 
 test : 	test_fribidi 
-	test_fribidi -capital_rtl tests/test-capital-rtl
+	./test_fribidi -capital_rtl tests/test-capital-rtl
 
 TESTS = run.tests
 

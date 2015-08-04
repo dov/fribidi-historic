@@ -1,8 +1,15 @@
-Main author: Dov Grobgeld <dov@imagic.weizmann.ac.il>
+Dov Grobgeld <dov@imagic.weizmann.ac.il>:
+   * Initial author and current maintainer.
+   
+Owen Tayler <otaylor.@edhat.com>:
+   * Contributed very important memory leak and speed patches.
 
-With patches by:
+Raphael Finkel <raphael@cs.uky.edu>       
+   * Contributed utf8 converters
 
-Raphael Finkel <raphael@cs.uky.edu>       - utf8 converters
-Pablo Saratxaga <pablo@mandrakesoft.com>  - several arabic charset converters
-Manish Singh <yosh@gimp.org>               - automake update
-Owen Taylor <otaylor@redhat.com>	  - plugged some memory leaks
+Pablo Saratxaga <pablo@mandrakesoft.com>  
+   * Contributed several arabic charset converters
+
+Manish Singh <yosh@gimp.org> 
+   * Contributed patch to make fribidi use libtool
+

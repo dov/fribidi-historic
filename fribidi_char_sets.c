@@ -20,8 +20,16 @@
 
 #define ISO_ALEF 0xE0
 #define ISO_TAV 0xFA
+
+/* The following two definitions are an extension to iso-8859-8 that were
+   agreed about at an Ivrix meeting 2000-04-14. */
+#define ISO_8_LRM 0xFE
+#define ISO_8_RLM 0xFF
+
 #define UNI_ALEF 0x05D0
 #define UNI_TAV 0x05EA
+#define UNI_LRM 0x200E
+#define UNI_RLM 0x200F
 
 #define CP1255_SHEVA 0xC0
 #define UNI_SHEVA 0x05B0
@@ -43,7 +51,13 @@
 FriBidiChar
 fribidi_iso8859_8_to_unicode_c(guchar ch)
 {
-  if (ch >= ISO_ALEF && ch <= ISO_TAV)
+  if (ch >= ISO_8_LRM) {
+    if (ch > ISO_8_LRM)
+      return UNI_RLM;
+    else
+      return UNI_LRM;
+  }
+  else if (ch >= ISO_ALEF && ch <= ISO_TAV)
     return ch-ISO_ALEF+UNI_ALEF;
   else
     return ch;
@@ -222,6 +236,10 @@ fribidi_unicode_to_iso8859_8_c(FriBidiChar uch)
 {
   if (uch >= UNI_ALEF && uch <= UNI_TAV)
     return (guchar)(uch-UNI_ALEF+ISO_ALEF);
+  if (uch == UNI_RLM)
+    return ISO_8_RLM;
+  if (uch == UNI_LRM)
+    return ISO_8_LRM;
   /* TODO: handle pre-composed and presentation chars */
   else if (uch < 256)
     return (guchar)uch;

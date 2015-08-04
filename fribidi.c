@@ -23,12 +23,16 @@
 /*======================================================================
 // Typedef for the run-length list.
 //----------------------------------------------------------------------*/
-typedef struct {
+typedef struct _TypeLink TypeLink;
+
+struct _TypeLink {
+  TypeLink *prev;
+  TypeLink *next;
   FriBidiCharType type;
   int pos;
   int len;
   int level;
-} TypeLink;
+};
 
 typedef struct {
   FriBidiChar key;
@@ -76,29 +80,57 @@ int16_array_reverse(gint16 *arr, gint len)
     }
 }
 
+static TypeLink *free_type_links = NULL;
+
 static TypeLink *new_type_link()
 {
-  TypeLink *link = g_new(TypeLink, 1);
+  TypeLink *link;
+  
+  if (free_type_links)
+    {
+      link = free_type_links;
+      free_type_links = free_type_links->next;
+    }
+  else
+    {
+      static GMemChunk *mem_chunk = NULL;
+
+      if (!mem_chunk)
+       mem_chunk = g_mem_chunk_new ("TypeLinkList",
+                                    sizeof (TypeLink),
+                                    sizeof (TypeLink) * 128,
+                                    G_ALLOC_ONLY);
+
+      link = g_chunk_new (TypeLink, mem_chunk);
+    }
+
   link->len = 0;
   link->pos = 0;
   link->level = 0;
+  link->next = NULL;
+  link->prev = NULL;
   return link;
 }
 
-static GList *run_length_encode_types(int *char_type, int type_len)
+static void free_type_link(TypeLink *link)
 {
-  GList *list = NULL;
-  GList *last;
+  link->next = free_type_links;
+  free_type_links = link;
+}
+
+static TypeLink *run_length_encode_types(int *char_type, int type_len)
+{
+  TypeLink *list = NULL;
+  TypeLink *last;
   TypeLink *link;
   FriBidiCharType type;
   int len, pos, i;
 
   /* Add the starting link */
-  link = new_type_link();
-  link->type = FRIBIDI_TYPE_SOT;
-  link->len = 0;
-  link->pos = 0;
-  list = g_list_append(NULL, link);
+  list = new_type_link();
+  list->type = FRIBIDI_TYPE_SOT;
+  list->len = 0;
+  list->pos = 0;
   last = list;
 
   /* Sweep over the string_types */
@@ -115,7 +147,8 @@ static GList *run_length_encode_types(int *char_type, int type_len)
 	      link->type = type;
 	      link->pos = pos;
 	      link->len = len;
-	      g_list_append(last, link);
+             last->next = link;
+             link->prev = last;
 	      last = last->next;
 	    }
 	  if (i==type_len)
@@ -132,30 +165,30 @@ static GList *run_length_encode_types(int *char_type, int type_len)
   link->type = FRIBIDI_TYPE_EOT;
   link->len = 0;
   link->pos = type_len;
-  g_list_append(last, link);
+  last->next = link;
+  link->prev = last;
 
   return list;
 }
 
 /* Some convenience macros */
-#define RL_TYPE(list) ((TypeLink*)list->data)->type
-#define RL_LEN(list) ((TypeLink*)list->data)->len
-#define RL_POS(list) ((TypeLink*)list->data)->pos
-#define RL_LEVEL(list) ((TypeLink*)list->data)->level
+#define RL_TYPE(list) (list)->type
+#define RL_LEN(list) (list)->len
+#define RL_POS(list) (list)->pos
+#define RL_LEVEL(list) (list)->level
 
-static void compact_list(GList *list)
+static void compact_list(TypeLink *list)
 {
   while(list)
     {
       if (list->prev
 	  && RL_TYPE(list->prev) == RL_TYPE(list))
 	{
-	  GList *next = list->next;
+         TypeLink *next = list->next;
 	  list->prev->next = list->next;
 	  list->next->prev = list->prev;
 	  RL_LEN(list->prev) = RL_LEN(list->prev) + RL_LEN(list);
-	  g_free(list->data);
-	  g_list_free_1(list);
+         free_type_link(list);
 	  list = next;
       }
       else
@@ -210,29 +243,29 @@ static void compact_list(GList *list)
 //  For debugging, define some macros for printing the types and the
 //  levels.
 //----------------------------------------------------------------------*/
-static void print_types_re(GList *pp)
+static void print_types_re(TypeLink *pp)
 {
   while(pp)
     {
       printf("%d:%c(%d)[%d] ", RL_POS(pp), RL_TYPE(pp), RL_LEN(pp), RL_LEVEL(pp));
-      pp = g_list_next(pp);
+      pp = pp->next;
     }
   printf("\n");
 }
 
-static void print_resolved_levels(GList *pp)
+static void print_resolved_levels(TypeLink *pp)
 {
   while(pp)
     {
       int i;
       for (i=0; i<RL_LEN(pp); i++)
 	printf("%d", RL_LEVEL(pp));
-      pp = g_list_next(pp);
+      pp = pp->next;
     }
   printf("\n");
 }
 
-static void print_resolved_types(GList *pp)
+static void print_resolved_types(TypeLink *pp)
 {
   while(pp)
     {
@@ -241,7 +274,7 @@ static void print_resolved_types(GList *pp)
 	{
 	  gchar ch;
 	  FriBidiCharType type = RL_TYPE(pp);
-
+         
 	  /* Convert the type to something readable */
 	  if (type == FRIBIDI_TYPE_R)
 	    ch = 'R';
@@ -258,7 +291,7 @@ static void print_resolved_types(GList *pp)
 	  
 	  printf("%c", ch);
 	}
-      pp = g_list_next(pp);
+      pp = pp->next;
     }
   printf("\n");
 }
@@ -274,13 +307,13 @@ static void print_bidi_string(FriBidiChar *str)
 /*======================================================================
 //  search_rl_for strong searches the run length list in the direction
 //  indicated by dir for a strong directional. It returns a pointer to
-//  the found character or NULL if none is found.
+//  the found character or NULL if none is found. */
 //----------------------------------------------------------------------*/
-static GList *
-search_rl_for_strong(GList *pos,
+static TypeLink *
+search_rl_for_strong(TypeLink *pos,
 		     gint  dir)
 {
-  GList *pp = pos;
+  TypeLink *pp = pos;
 
   if (dir == -1)
     {
@@ -314,14 +347,15 @@ fribidi_analyse_string(/* input */
 		       int len,
 		       FriBidiCharType *pbase_dir,
 		       /* output */
-		       GList **ptype_rl_list,
+                      TypeLink **ptype_rl_list,
 		       gint *pmax_level)
 {
   int base_level, base_dir;
   int max_level;
   int i;
   int *char_type;
-  GList *type_rl_list, *pp;
+  int prev_last_strong, last_strong;
+  TypeLink *type_rl_list, *pp;
 
   /* Determinate character types */
   char_type = g_new(gint, len);
@@ -394,29 +428,44 @@ fribidi_analyse_string(/* input */
   compact_list(type_rl_list);
   
   /* 4. Resolving weak types */
+  last_strong = base_dir;
   for (pp = type_rl_list->next; pp->next; pp = pp->next)
     {
       int prev_type = RL_TYPE(pp->prev);
       int this_type = RL_TYPE(pp);
       int next_type = RL_TYPE(pp->next);
 
-      /* C0. */
-      TYPE_RULE2(R, CM,      R, R);
-      TYPE_RULE2(L, CM,      L, L);
-      TYPE_RULE2(SOT, CM,    SOT, N);
+      /* Remember the last strong character */
+      if (prev_type == FRIBIDI_TYPE_AL
+	  || prev_type == FRIBIDI_TYPE_R
+	  || prev_type == FRIBIDI_TYPE_L)
+	  last_strong = prev_type;
       
-      /* P0. */
-      /* Changing european numbers to Arabic numbers. TODO! */
+      /* W1. NSM */
+      if (this_type == FRIBIDI_TYPE_NSM)
+	{
+	  if (prev_type == FRIBIDI_TYPE_SOT)
+	    RL_TYPE(pp) = FRIBIDI_TYPE_N;       /* Will be resolved to base dir */
+	  else
+	    RL_TYPE(pp) = prev_type;
+	}
 
-      /* P0a. */
-      TYPE_RULE2(EN,BN,    EN,EN);
-      TYPE_RULE2(BN,EN,    EN,EN);
-      TYPE_RULE2(AN,BN,    AN,AN);
-      TYPE_RULE2(BN,AN,    AN,AN);
-      TYPE_RULE_C(AN,BN,EN,    EN);
-      TYPE_RULE_C(EN,BN,AN,    EN);
+      /* W2: European numbers */
+      if (this_type == FRIBIDI_TYPE_N
+	  && last_strong == FRIBIDI_TYPE_AL)
+	RL_TYPE(pp) = FRIBIDI_TYPE_AN;
 
-      /* P1. */
+      /* W3: Change ALs to R
+	 We have to do this for prev character as we would otherwise
+	 interfer with the next last_strong which is FRIBIDI_TYPE_AL.
+       */
+      if (prev_type == FRIBIDI_TYPE_AL)
+	RL_TYPE(pp->prev) = FRIBIDI_TYPE_R;
+
+      /* W4. A single european separator changes to a european number.
+	 A single common separator between two numbers of the same type
+	 changes to that type.
+       */
       if (RL_LEN(pp) == 1) 
 	{
 	  TYPE_RULE_C(EN,ES,EN,   EN);
@@ -424,10 +473,30 @@ fribidi_analyse_string(/* input */
 	  TYPE_RULE_C(AN,CS,AN,   AN);
 	}
 
-      /* P2. */
-      TYPE_RULE2(ET,EN,   EN,EN);
-      TYPE_RULE2(EN,ET,   EN,EN);
-      TYPE_RULE_C(AN,ET,EN,   EN);
+      /* W5. A sequence of European terminators adjacent to European
+	 numbers changes to All European numbers.
+       */
+      if (this_type == FRIBIDI_TYPE_ET)
+	{
+	  if (next_type == FRIBIDI_TYPE_EN
+	      || prev_type == FRIBIDI_TYPE_EN) {
+	    RL_TYPE(pp) = FRIBIDI_TYPE_EN;
+	  }
+	}
+
+      /* This type may have been overriden */
+      this_type = RL_TYPE(pp);
+      
+      /* W6. Otherwise change separators and terminators to other neutral */
+      if (this_type == FRIBIDI_TYPE_ET
+	  || this_type == FRIBIDI_TYPE_CS
+	  || this_type == FRIBIDI_TYPE_ES)
+	RL_TYPE(pp) = FRIBIDI_TYPE_ON;
+
+      /* W7. Change european numbers to L. */
+      if (prev_type == FRIBIDI_TYPE_EN
+	  && last_strong == FRIBIDI_TYPE_L)
+	RL_TYPE(pp->prev) = FRIBIDI_TYPE_L;
     }
 
   compact_list(type_rl_list);
@@ -461,99 +530,23 @@ fribidi_analyse_string(/* input */
 
       if (this_type == FRIBIDI_TYPE_N)   /* optimization! */
 	{
+	  /* "European and arabic numbers are treated
+	     as though they were R" */
+
+	  if (prev_type == FRIBIDI_TYPE_EN || prev_type == FRIBIDI_TYPE_AN)
+	    prev_type = FRIBIDI_TYPE_R;
+
+	  if (next_type == FRIBIDI_TYPE_EN || next_type == FRIBIDI_TYPE_AN)
+	    next_type = FRIBIDI_TYPE_R;
+
 	  /* N1. */
 	  TYPE_RULE_C(R,N,R,   R);
 	  TYPE_RULE_C(L,N,L,   L);
-	  
-	  /* N2 */
-	  TYPE_RULE_C(L,N,R,     E);
-	  TYPE_RULE_C(R,N,L,     E);
-	  TYPE_RULE_C(L,N,EOT,   E);
-	  TYPE_RULE_C(R,N,EOT,   E);
-	  TYPE_RULE_C(SOT,N,L,   E);
-	  TYPE_RULE_C(SOT,N,R,   E);
+
+	  /* N2. Any remaining neutrals takes the embedding direction */
+	  if (RL_TYPE(pp) == FRIBIDI_TYPE_N)
+	    RL_TYPE(pp) = FRIBIDI_TYPE_E;
 	}
-
-      /* N3a, b
-
-	 For the purpose of resolving neutral European numbers
-	 inherit the type of the previous strong character
-	 or if there is none found, they get the type of the base direction.
-       */
-      else if (this_type == FRIBIDI_TYPE_EN)
-	{
-	  GList *p_bck, *p_fwd, *pp1;
-	  FriBidiCharType num_type, fwd_type;
-
-	  /* Search backwards for a strong character */
-	  p_bck = search_rl_for_strong(pp, -1);
-	  
-	  /* The EN is considered to be of this type */
-	  if (p_bck)
-	    num_type = RL_TYPE(p_bck);
-	  /* Or the embedding type */
-	  else
-	    num_type = FRIBIDI_TYPE_E;
-
-	  /* Override all neutrals between p_bck and this pp */
-	  for (pp1 = pp->prev; pp1 != p_bck; pp1=pp1->prev)
-	    {
-	      if (RL_TYPE(pp1) != FRIBIDI_TYPE_N)
-		break;
-	      RL_TYPE(pp1) = num_type;
-	    }
-
-	  /* Now search forwards for a strong character */
-	  p_fwd = search_rl_for_strong(pp, 1);
-	  if (p_fwd)
-	    fwd_type = RL_TYPE(p_fwd);
-	  /* Or the embedding type */
-	  else
-	    fwd_type = FRIBIDI_TYPE_E;
-
-	  /* Override with the embedding type if fwd_type != num_type */
-	  if (fwd_type != num_type)
-	    fwd_type = FRIBIDI_TYPE_E;
-
-	  for (pp1 = pp->next; pp1 != p_fwd; pp1=pp1->next)
-	    {
-	      if (RL_TYPE(pp1) != FRIBIDI_TYPE_N)
-		break;
-	      RL_TYPE(pp1) = fwd_type;
-	    }
-	}
-    }
-
-  /* Make a separate sweep where Arabic numbers are treated as R. The
-     loop is made separate in order not to influence the treatment
-     of european numbers above. */
-  for (pp = type_rl_list->next; pp->next; pp = pp->next)
-    {
-      int prev_type, next_type, this_type = RL_TYPE(pp);
-
-      if (this_type != FRIBIDI_TYPE_N)        /* optimization */
-	continue;
-      
-      prev_type = RL_TYPE(pp->prev);
-      next_type = RL_TYPE(pp->next);
-
-      /* this_type cannot be AN so there is no need to check. */
-      if (prev_type == FRIBIDI_TYPE_AN)
-	prev_type = FRIBIDI_TYPE_R;
-      if (next_type == FRIBIDI_TYPE_AN)
-	next_type = FRIBIDI_TYPE_R;
-      
-      /* N1. */
-      TYPE_RULE_C(R,N,R,   R);
-      TYPE_RULE_C(L,N,L,   L);
-
-      /* N2 */
-      TYPE_RULE_C(L,N,R,    E);
-      TYPE_RULE_C(R,N,L,    E);
-      TYPE_RULE_C(L,N,EOT,  E);
-      TYPE_RULE_C(R,N,EOT,  E);
-      TYPE_RULE_C(SOT,N,L,  E);
-      TYPE_RULE_C(SOT,N,R,  E);
     }
 
   compact_list(type_rl_list);
@@ -634,7 +627,7 @@ void fribidi_log2vis(/* input */
 		     guint8      *embedding_level_list
 		     )
 {
-  GList *type_rl_list, *pp;
+  TypeLink *type_rl_list, *pp = NULL;
   int max_level;
   gboolean private_L_to_V = FALSE;
 
@@ -716,7 +709,7 @@ void fribidi_log2vis(/* input */
 		    /* Find all stretches that are >= level_idx */
 		    int len = RL_LEN(pp);
 		    int pos = RL_POS(pp);
-		    GList *pp1 = pp->next;
+                   TypeLink *pp1 = pp->next;
 		    while(pp1->next && RL_LEVEL(pp1) >= level_idx)
 		      {
 			len+= RL_LEN(pp1);
@@ -741,8 +734,15 @@ void fribidi_log2vis(/* input */
   }
 
   /* Free up the rl_list */
-  g_list_foreach(type_rl_list, (GFunc)g_free, NULL);
-  g_list_free(type_rl_list);
+
+  /* At this point, pp points to the last link or (rarely) might be NULL
+   */
+  if (!pp)
+    for (pp = type_rl_list->next; pp->next; pp = pp->next)
+      /* Nothing */;
+  
+  pp->next = free_type_links;
+  free_type_links = type_rl_list;
 
   /* Free up L_to_V if we allocated it */
   if (private_L_to_V)
@@ -763,7 +763,7 @@ void fribidi_log2vis_get_embedding_levels(
 		     guint8 *embedding_level_list
 		     )
 {
-  GList *type_rl_list, *pp;
+  TypeLink *type_rl_list, *pp;
   int max_level;
   
   fribidi_analyse_string(str, len, pbase_dir,
@@ -780,9 +780,9 @@ void fribidi_log2vis_get_embedding_levels(
       for (i=0; i<len; i++)
 	embedding_level_list[pos + i] = level;
     }
-
+  
   /* Free up the rl_list */
-  g_list_foreach(type_rl_list, (GFunc)g_free, NULL);
-  g_list_free(type_rl_list);
+  pp->next = free_type_links;
+  free_type_links = type_rl_list;
 }
 

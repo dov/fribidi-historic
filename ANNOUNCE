@@ -1,14 +1,14 @@
-I have relased a new version 0.1.9 of fribidi with the following major
-changes:
+I have relased a new version 0.1.12 of fribidi with the following 
+major changes:
 
-    * Changed basic type FriBidiChar to guint32 which corresponds
-      to UCS4.
+     * Applied a speed patch by Owen Taylor that makes fribidi almost
+       4 times faster.
 
-    * Added the missing rule EN,ET=>EN,EN , and thus fixed a major
-      bug in the algorithm.
+     * Updated the algorithm according to the latest Unicode specification.
+       (Still no explicit overrides though).
 
-    * Fixed several memory leaks found by Owen Taylor.
-
+     * Added support for the LRM and RLM characters for the iso-8859-8 
+       converts at unused positions 0xFE and 0xFF . 
 
 Here's the blurb in case someone missed it:
 

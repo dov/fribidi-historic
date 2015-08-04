@@ -12,10 +12,12 @@ that our Arab neighbors will also find this software useful.
 
 Audience
 ========
+
 It is my hope that this library will stimulate the implementation of
-Hebrew in lots of free software. Here is a small list of projects that
-would benifit from the use of the fribidi library, but of course there
-are many more: Wine, Mozilla, Gtk, AbiWord, lynx.
+Hebrew and Arabic in lots of free software. Here is a small list of
+projects that would benifit from the use of the FriBidi library, but
+of course there are many more: Wine, Mozilla, Gtk, Gnome, Qt, KDE,
+AbiWord, lynx.
 
 Downloading
 ===========
@@ -29,14 +31,15 @@ See INSTALL for a description of how to build and install this library.
 
 Implementation
 ==============
-The library implements almost all of the algorithm as described in the
+The library implements most of the algorithm as described in the
 "Unicode Bidirectional Algorithm, Working Draft Unicode Technical Report
-#9, http://www.unicode.org/unicode/reports/tr9/". For more details
-about what parts are missing see the TODO file.
+#9, http://www.unicode.org/unicode/reports/tr9/". The major feature
+that is currently missing is the support for explicit overrides.
 
 In the API I was was inspired by the document "Bi-Di languages support
-- BiDi API propasal" by Franck Portaneri <franck@langbox.com> which 
-he wrote as a proposal for adding BiDi support to Mozilla.
+- BiDi API propasal", http://www.langbox.com/AraMosaic/mozilla/BiDi_API.html,
+by Franck Portaneri <franck@langbox.com> which he wrote as a proposal
+for adding BiDi support to Mozilla.
 
 Internally the library uses Unicode entirely. The character property
 function was automatically created from the Unicode property list

@@ -1,5 +1,5 @@
-LIBS = `gtk-config --libs`
-CFLAGS = -g -Wall `gtk-config --cflags`
+LIBS = `glib-config --libs`
+CFLAGS = -g -Wall `glib-config --cflags`
 
 noinst_PROGRAMS = test_fribidi fribidi_benchmark
 

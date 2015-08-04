@@ -14,7 +14,7 @@ fi
 echo "=== Running test $0"
 
 # Attempt to execute the program we built.
-test_fribidi -capital_rtl tests/test-capital-rtl | tee > test.output
+./test_fribidi -capital_rtl tests/test-capital-rtl | tee > test.output
 
 if diff test.output test.reference; then
   exit 0

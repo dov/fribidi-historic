@@ -195,14 +195,12 @@ static void compact_list(GList *list)
 
 /* For optimization the following macro only assigns the center type */
 #define TYPE_RULE_C(old_prev, old_this, old_next,   \
-		  new_prev, new_this, new_next)   \
+		    new_this)   \
      if (    prev_type == FRIBIDI_TYPE_ ## old_prev       \
 	  && this_type == FRIBIDI_TYPE_ ## old_this       \
 	  && next_type == FRIBIDI_TYPE_ ## old_next)      \
        {                                          \
-	   RL_TYPE(pp->prev) = FRIBIDI_TYPE_ ## new_prev; \
 	   RL_TYPE(pp) =       FRIBIDI_TYPE_ ## new_this; \
-	   RL_TYPE(pp->next) = FRIBIDI_TYPE_ ## new_next; \
            continue;                              \
        }
 
@@ -362,13 +360,13 @@ fribidi_analyse_string(/* input */
 	  }
     }
   
-  /* 1. Explicit Levels and Directions */
+  /* 1. Explicit Levels and Directions. TBD! */
   compact_list(type_rl_list);
   
-  /* 2. Explicit Overrides */
+  /* 2. Explicit Overrides. TBD! */
   compact_list(type_rl_list);
   
-  /* 3. Terminating Embeddings and overrides */
+  /* 3. Terminating Embeddings and overrides. TBD! */
   compact_list(type_rl_list);
   
   /* 4. Resolving weak types */
@@ -391,15 +389,15 @@ fribidi_analyse_string(/* input */
       TYPE_RULE2(BN,EN,    EN,EN);
       TYPE_RULE2(AN,BN,    AN,AN);
       TYPE_RULE2(BN,AN,    AN,AN);
-      TYPE_RULE_C(AN,BN,EN,    AN,EN,EN);
-      TYPE_RULE_C(EN,BN,AN,    EN,EN,AN);
+      TYPE_RULE_C(AN,BN,EN,    EN);
+      TYPE_RULE_C(EN,BN,AN,    EN);
 
       /* P1. */
       if (RL_LEN(pp) == 1) 
 	{
-	  TYPE_RULE_C(EN,ES,EN,   EN,EN,EN);
-	  TYPE_RULE_C(EN,CS,EN,   EN,EN,EN);
-	  TYPE_RULE_C(AN,CS,AN,   AN,AN,AN);
+	  TYPE_RULE_C(EN,ES,EN,   EN);
+	  TYPE_RULE_C(EN,CS,EN,   EN);
+	  TYPE_RULE_C(AN,CS,AN,   AN);
 	}
 
       /* P2. */
@@ -410,9 +408,8 @@ fribidi_analyse_string(/* input */
   
   /* 5. Resolving Neutral Types */
   if (fribidi_debug)
-    {
       fprintf(stderr,"Resolving neutral types.\n");
-    }
+
   /* We can now collapse all separators and other neutral types to
      plain neutrals */
   for (pp = type_rl_list->next; pp->next; pp = pp->next)
@@ -436,25 +433,28 @@ fribidi_analyse_string(/* input */
       int this_type = RL_TYPE(pp);
       int next_type = RL_TYPE(pp->next);
 
-      /* N1. */
-      TYPE_RULE(R,N,R,   R,R,R);
-      TYPE_RULE(L,N,L,   L,L,L);
-
-      /* N2 */
-      TYPE_RULE(L,N,R,   L,E,R);
-      TYPE_RULE(R,N,L,   R,E,L);
-      TYPE_RULE(L,N,EOT,   L,E,EOT);
-      TYPE_RULE(R,N,EOT,   R,E,EOT);
-      TYPE_RULE(SOT,N,L,   SOT,E,L);
-      TYPE_RULE(SOT,N,R,   SOT,E,R);
+      if (this_type == FRIBIDI_TYPE_N)   /* optimization! */
+	{
+	  /* N1. */
+	  TYPE_RULE_C(R,N,R,   R);
+	  TYPE_RULE_C(L,N,L,   L);
+	  
+	  /* N2 */
+	  TYPE_RULE_C(L,N,R,     E);
+	  TYPE_RULE_C(R,N,L,     E);
+	  TYPE_RULE_C(L,N,EOT,   E);
+	  TYPE_RULE_C(R,N,EOT,   E);
+	  TYPE_RULE_C(SOT,N,L,   E);
+	  TYPE_RULE_C(SOT,N,R,   E);
+	}
 
       /* N3a, b
 
-	 For the purpose of resolving neutrals European numbers
+	 For the purpose of resolving neutral European numbers
 	 inherit the type of the previous strong character
 	 or if there is none found, they get the type of the base direction.
        */
-      if (this_type == FRIBIDI_TYPE_EN)
+      else if (this_type == FRIBIDI_TYPE_EN)
 	{
 	  GList *p_bck, *p_fwd, *pp1;
 	  FriBidiCharType num_type, fwd_type;
@@ -503,28 +503,31 @@ fribidi_analyse_string(/* input */
      of european numbers above. */
   for (pp = type_rl_list->next; pp->next; pp = pp->next)
     {
-      int prev_type = RL_TYPE(pp->prev);
-      int this_type = RL_TYPE(pp);
-      int next_type = RL_TYPE(pp->next);
+      int prev_type, next_type, this_type = RL_TYPE(pp);
 
-      if (this_type == FRIBIDI_TYPE_AN)
-	this_type = FRIBIDI_TYPE_R;
+      if (this_type != FRIBIDI_TYPE_N)        /* optimization */
+	continue;
+      
+      prev_type = RL_TYPE(pp->prev);
+      next_type = RL_TYPE(pp->next);
+
+      /* this_type cannot be AN so there is no need to check. */
       if (prev_type == FRIBIDI_TYPE_AN)
 	prev_type = FRIBIDI_TYPE_R;
       if (next_type == FRIBIDI_TYPE_AN)
 	next_type = FRIBIDI_TYPE_R;
       
       /* N1. */
-      TYPE_RULE(R,N,R,   R,R,R);
-      TYPE_RULE(L,N,L,   L,L,L);
+      TYPE_RULE_C(R,N,R,   R);
+      TYPE_RULE_C(L,N,L,   L);
 
       /* N2 */
-      TYPE_RULE(L,N,R,   L,E,R);
-      TYPE_RULE(R,N,L,   R,E,L);
-      TYPE_RULE(L,N,EOT,   L,E,EOT);
-      TYPE_RULE(R,N,EOT,   R,E,EOT);
-      TYPE_RULE(SOT,N,L,   SOT,E,L);
-      TYPE_RULE(SOT,N,R,   SOT,E,R);
+      TYPE_RULE_C(L,N,R,    E);
+      TYPE_RULE_C(R,N,L,    E);
+      TYPE_RULE_C(L,N,EOT,  E);
+      TYPE_RULE_C(R,N,EOT,  E);
+      TYPE_RULE_C(SOT,N,L,  E);
+      TYPE_RULE_C(SOT,N,R,  E);
     }
 
   compact_list(type_rl_list);

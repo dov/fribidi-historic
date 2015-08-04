@@ -304,6 +304,8 @@ search_rl_for_strong(GList *pos,
 
 /*======================================================================
 //  This function should follow the Unicode specification closely!
+//
+//  It is still lacking the support for <RLO> and <LRO>.
 //----------------------------------------------------------------------*/
 static void
 fribidi_analyse_string(/* input */
@@ -759,42 +761,3 @@ void fribidi_log2vis_get_embedding_levels(
   g_list_free(type_rl_list);
 }
 
-/*======================================================================
-//  fribidi_find_string_changes() finds the bounding box of the section
-//  of characters that need redrawing. It returns the start and the
-//  length of the section in the new string that needs redrawing.
-//----------------------------------------------------------------------*/
-void
-fribidi_find_string_changes(/* input */
-			    FriBidiChar *old_str,
-			    int old_len,
-			    FriBidiChar *new_str,
-			    int new_len,
-			    /* output */
-			    int *change_start,
-			    int *change_len
-			    )
-{
-  int i;
-  int num_bol, num_eol;
-
-  /* Search forwards */
-  i = 0;
-  while(    i < old_len
-	 && i < new_len
-	 && old_str[i] == new_str[i])
-    i++;
-  num_bol = i;
-
-  /* Search backwards */
-  i = 0;
-  while(    i <old_len
-	 && i <new_len
-	 && old_str[old_len-1-i] == new_str[new_len-1-i])
-    i++;
-  num_eol = i;
-
-  /* Assign output */
-  *change_start = num_bol;
-  *change_len = new_len - num_eol - num_bol;
-}

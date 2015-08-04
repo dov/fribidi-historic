@@ -1,3 +1,8 @@
+1999-06-20  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Created file fribidi_utils.c which will be used for common 
+	  patterns that are common in Bidi supported programs.
+
 1999-04-28  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
 
 	* Fixed bug in fribidi_log2vis which occured if only the v2l

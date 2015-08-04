@@ -8,7 +8,8 @@ libfribidi_a_SOURCES = \
 	fribidi.c	    \
 	fribidi_tables.i    \
 	fribidi_char_sets.c \
-	fribidi_get_type.c  
+	fribidi_get_type.c  \
+	fribidi_utils.c
 
 libfribidiincdir = $(includedir)/fribidi
 libfribidiinc_HEADERS = \

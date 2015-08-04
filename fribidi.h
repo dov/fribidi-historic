@@ -56,6 +56,8 @@ void fribidi_log2vis_get_embedding_levels(
 		     guint8 *embedding_level_list
 		     );
 
+/* fribidi_utils.c */
+
 void
 fribidi_find_string_changes(/* input */
 			    FriBidiChar *old_str,
@@ -66,4 +68,16 @@ fribidi_find_string_changes(/* input */
 			    int *change_start,
 			    int *change_len
 			    );
+
+
+void
+fribidi_map_range          (gint span[2],             
+			    gboolean is_v2l_map,      
+			    guint16 *position_map,
+			    guint8 *embedding_level_list,
+			    int len,
+			    /* output */
+			    int *num_mapped_spans,
+			    int spans[3][2]);
+
 #endif

@@ -18,18 +18,27 @@
  */
 #include "fribidi.h"
 
-#define ISO_ALEF 0xE0
-#define ISO_TAV 0xFA
+#define ISO_ALEF 224
+#define ISO_TAV 250
 
-/* The following two definitions are an extension to iso-8859-8 that were
-   agreed about at an Ivrix meeting 2000-04-14. */
-#define ISO_8_LRM 0xFE
-#define ISO_8_RLM 0xFF
+/* The following are proposed extensions to iso-8859-8. */
+#define ISO_8_LRM 253
+#define ISO_8_RLM 254
+#define ISO_8_LRE 251
+#define ISO_8_RLE 252
+#define ISO_8_PDF 221
+#define ISO_8_LRO 219
+#define ISO_8_RLO 220
 
 #define UNI_ALEF 0x05D0
 #define UNI_TAV 0x05EA
 #define UNI_LRM 0x200E
 #define UNI_RLM 0x200F
+#define UNI_LRE 0x202a
+#define UNI_RLE 0x202b
+#define UNI_PDF 0x202c
+#define UNI_LRO 0x202d
+#define UNI_RLO 0x202e
 
 #define CP1255_SHEVA 0xC0
 #define UNI_SHEVA 0x05B0
@@ -51,6 +60,13 @@
 FriBidiChar
 fribidi_iso8859_8_to_unicode_c(guchar ch)
 {
+  /* optimization */
+  if (ch < ISO_8_LRO)
+    return ch;
+  else if (ch >= ISO_ALEF && ch <= ISO_TAV)
+    return ch-ISO_ALEF+UNI_ALEF;
+  else if (ch == ISO_RLM) return UNI_RLM)
+
   if (ch >= ISO_8_LRM) {
     if (ch > ISO_8_LRM)
       return UNI_RLM;

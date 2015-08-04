@@ -64,6 +64,7 @@ CC = @CC@
 DLLTOOL = @DLLTOOL@
 GLIB_CFLAGS = @GLIB_CFLAGS@
 GLIB_CONFIG = @GLIB_CONFIG@
+GLIB_CONFIG_2_0 = @GLIB_CONFIG_2_0@
 GLIB_LIBS = @GLIB_LIBS@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -88,7 +89,7 @@ libfribidiincdir = $(includedir)/fribidi
 libfribidiinc_HEADERS =  	fribidi.h 	fribidi_char_sets.h 	fribidi_types.h
 
 
-EXTRA_DIST =          CreateGetType.pl 	tests/test-hebrew 	tests/test-capital-rtl 	run.tests 	test.reference 	ANNOUNCE
+EXTRA_DIST =          CreateGetType.pl 	tests/test-hebrew 	tests/test-capital-rtl 	run.tests 	test.reference 	ANNOUNCE 	acinclude.m4
 
 
 test_fribidi_SOURCES = test_fribidi.c
@@ -140,8 +141,8 @@ LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 HEADERS =  $(libfribidiinc_HEADERS)
 
 DIST_COMMON =  README ./stamp-h.in AUTHORS COPYING ChangeLog INSTALL \
-Makefile.am Makefile.in NEWS THANKS TODO acconfig.h aclocal.m4 \
-config.guess config.h.in config.sub configure configure.in \
+Makefile.am Makefile.in NEWS THANKS TODO acconfig.h acinclude.m4 \
+aclocal.m4 config.guess config.h.in config.sub configure configure.in \
 fribidi-config.in install-sh ltconfig ltmain.sh missing mkinstalldirs
 
 
@@ -162,7 +163,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-$(ACLOCAL_M4):  configure.in 
+$(ACLOCAL_M4):  configure.in  acinclude.m4
 	cd $(srcdir) && $(ACLOCAL)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)

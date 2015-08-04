@@ -27,7 +27,8 @@ EXTRA_DIST = \
 	tests/test-capital-rtl \
 	run.tests \
 	test.reference \
-	ANNOUNCE
+	ANNOUNCE \
+	acinclude.m4
 
 test_fribidi_SOURCES = test_fribidi.c
 test_fribidi_LDADD = libfribidi.la $(GLIB_LIBS)

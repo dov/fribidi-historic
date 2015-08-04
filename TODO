@@ -8,13 +8,9 @@ General issues:
 
 * Clean up code
 
-* Optimize binary searches.
-
 * Better documentation
 
 * Write some utility programs.
-
-* Is it worthwile to make the library shared? Comments?
 
 * Write notes and a reference implementation for the following interactions
   with fribidi:

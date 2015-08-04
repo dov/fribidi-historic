@@ -1,17 +1,20 @@
-* Clean up code
+BiDi algorithms issues:
 
 * Support LRE, RLE, RLO and LRO.
 
+* Handle automatic convertion of european numerals to arabic numerals.
+
+General issues:
+
+* Clean up code
+
 * Optimize binary searches.
 
-* Documentation
+* Better documentation
 
 * Write some utility programs.
 
 * Is it worthwile to make the library shared? Comments?
-
-* Write a program, fribidi, that reads a text file and carries out 
-  the BiDi algorithm on it.
 
 * Write notes and a reference implementation for the following interactions
   with fribidi:
@@ -34,9 +37,10 @@
 * Write a description of the needed steps to convert a LTR editor into a
   BiDi aware editor.
 
-* Make a the library callable through a perl module through Swig. 
-
 * Make interfaces to other scripting languages if there is any interest.
 
-* Implement fill algorithm in the fribidi program. (Perhaps this is 
-  a waste of time if the perl library is anyhow implemented.)
+* Implement string comparison which finds changes bounding box.
+
+* Consider the implications of a minimal incremental algorithm for
+  adding a single character.
+

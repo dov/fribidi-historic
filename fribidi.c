@@ -306,23 +306,20 @@ search_rl_for_strong(GList *pos,
 /*======================================================================
 //  This function should follow the Unicode specification closely!
 //----------------------------------------------------------------------*/
-void fribidi_log2vis(/* input */
-		     FriBidiChar *str, int *pbase_dir,
-		     /* output */
-		     FriBidiChar *visual_str,
-		     gint *positionLtoV,
-		     gint *positionVtoL
-		     )
+static void
+fribidi_analyse_string(/* input */
+		       FriBidiChar *str,
+		       int len,
+		       FriBidiCharType *pbase_dir,
+		       /* output */
+		       GList **ptype_rl_list,
+		       gint *pmax_level)
 {
   int base_level, base_dir;
   int max_level;
-  int len;
   int i;
   int *char_type;
   GList *type_rl_list, *pp;
-
-  /* Calc the string length */
-  len = bidi_string_strlen(str);
 
   /* Determinate character types */
   char_type = g_new(gint, len);
@@ -577,83 +574,205 @@ void fribidi_log2vis(/* input */
   
   compact_list(type_rl_list);
 
-  if (fribidi_debug) {
-    print_bidi_string(str);
-    print_resolved_levels(type_rl_list);
-    print_resolved_types(type_rl_list);
-  }
+  if (fribidi_debug)
+    {
+      print_bidi_string(str);
+      print_resolved_levels(type_rl_list);
+      print_resolved_types(type_rl_list);
+    }
+
+  *ptype_rl_list = type_rl_list;
+  *pmax_level = max_level;
+  *pbase_dir = base_dir;
+}
+
+/*======================================================================
+//  Here starts the exposed front end functions.
+//----------------------------------------------------------------------*/
+
+/*======================================================================
+//  fribidi_log2vis() calls the function_analyse_string() and then
+//  does reordering and fills in the output strings.
+//----------------------------------------------------------------------*/
+void fribidi_log2vis(/* input */
+		     FriBidiChar *str,
+		     int len,
+		     FriBidiCharType *pbase_dir,
+		     /* output */
+		     FriBidiChar *visual_str,
+		     gint        *position_L_to_V_list,
+		     gint        *position_V_to_L_list,
+		     gint8       *embedding_level_list
+		     )
+{
+  GList *type_rl_list, *pp;
+  int max_level;
   
+  fribidi_analyse_string(str, len, pbase_dir,
+			 /* output */
+			 &type_rl_list,
+			 &max_level);
+
   /* 7. Reordering resolved levels */
   if (fribidi_debug)
     fprintf(stderr, "Reordering.\n");
+
   {
     int level_idx;
     int i;
 
     /* Set up the ordering array to sorted order and copy the logical
        string to the visual */
-    for (i=0; i<len+1; i++)
-      {
-	positionLtoV[i]=i;
+    if (position_L_to_V_list)
+      for (i=0; i<len+1; i++)
+	position_L_to_V_list[i]=i;
+    
+    if (visual_str)
+      for (i=0; i<len+1; i++)
 	visual_str[i] = str[i];
+
+    /* Assign the embedding level array */
+    if (embedding_level_list)
+      for (pp = type_rl_list->next; pp->next; pp = pp->next)
+	{
+	  int i;
+	  int pos = RL_POS(pp);
+	  int len = RL_LEN(pp);
+	  int level = RL_LEVEL(pp);
+	  for (i=0; i<len; i++)
+	    embedding_level_list[pos + i] = level;
       }
     
-    /* Reverse odd level characters */
-    for (pp = type_rl_list->next; pp->next; pp = pp->next)
-      {
-	if (RL_LEVEL(pp) % 2 == 1)
-	  {
-	    int i;
-	    for (i=RL_POS(pp); i<RL_POS(pp)+RL_LEN(pp); i++)
-	      {
-		FriBidiChar mirrored_ch;
-	        if (fribidi_get_mirror_char(visual_str[i], &mirrored_ch))
-		  visual_str[i] = mirrored_ch;
-	      }
-	  }
-      }
-
     /* Reorder both the outstring and the order array*/
-    for (level_idx = max_level; level_idx>0; level_idx--)
+    if (visual_str || position_L_to_V_list)
       {
-	for (pp = type_rl_list->next; pp->next; pp = pp->next)
-	  {
-	    if (RL_LEVEL(pp) >= level_idx)
-	      {
-		/* Find all stretches that are >= level_idx */
-		int len = RL_LEN(pp);
-		int pos = RL_POS(pp);
-		GList *pp1 = pp->next;
-		while(pp1->next && RL_LEVEL(pp1) >= level_idx)
-		  {
-		    len+= RL_LEN(pp1);
-		    pp1 = pp1->next;
-		  }
 
-		pp = pp1->prev;
-		bidi_string_reverse(visual_str+pos, len);
-		int_array_reverse(positionLtoV+pos, len);
+	if (visual_str)
+	  /* Mirror all characters that are in odd levels and have mirrors */
+	  for (pp = type_rl_list->next; pp->next; pp = pp->next)
+	    {
+	      if (RL_LEVEL(pp) % 2 == 1)
+		{
+		  int i;
+		  for (i=RL_POS(pp); i<RL_POS(pp)+RL_LEN(pp); i++)
+		    {
+		      FriBidiChar mirrored_ch;
+		      if (fribidi_get_mirror_char(visual_str[i], &mirrored_ch))
+			visual_str[i] = mirrored_ch;
+		    }
+		}
+	    }
+
+	/* Reorder */
+	for (level_idx = max_level; level_idx>0; level_idx--)
+	  {
+	    for (pp = type_rl_list->next; pp->next; pp = pp->next)
+	      {
+		if (RL_LEVEL(pp) >= level_idx)
+		  {
+		    /* Find all stretches that are >= level_idx */
+		    int len = RL_LEN(pp);
+		    int pos = RL_POS(pp);
+		    GList *pp1 = pp->next;
+		    while(pp1->next && RL_LEVEL(pp1) >= level_idx)
+		      {
+			len+= RL_LEN(pp1);
+			pp1 = pp1->next;
+		      }
+		    
+		    pp = pp1->prev;
+		    if (visual_str)
+		      bidi_string_reverse(visual_str+pos, len);
+		    if (position_L_to_V_list)
+		      int_array_reverse(position_L_to_V_list+pos, len);
+
+		  }
 	      }
 	  }
       }
 
     /* Convert the l2v list to v2l */
-    for (i=0; i<len; i++)
-      positionVtoL[positionLtoV[i]] = i;
-    if (fribidi_debug)
-      {
-	for (i=0; i<len; i++)
-	  fprintf(stderr, "%2d ", positionLtoV[i]);
-	fprintf(stderr, "\n");
-	for (i=0; i<len; i++)
-	  fprintf(stderr, "%2d ", positionVtoL[i]);
-	fprintf(stderr, "\n");
-      }
-	
+    if (position_V_to_L_list && position_L_to_V_list)
+      for (i=0; i<len; i++)
+	position_V_to_L_list[position_L_to_V_list[i]] = i;
   }
-
-  *pbase_dir = base_dir;
 
   /* Free up the rl_list */
   g_list_free(type_rl_list);
+  
+}
+
+/*======================================================================
+//  fribidi_embedding_levels() is used in order to just get the
+//  embedding levels.
+//----------------------------------------------------------------------*/
+void fribidi_log2vis_get_embedding_levels(
+                     /* input */
+		     FriBidiChar *str,
+		     int len,
+		     FriBidiCharType *pbase_dir,
+		     /* output */
+		     gint8 *embedding_level_list
+		     )
+{
+  GList *type_rl_list, *pp;
+  int max_level;
+  
+  fribidi_analyse_string(str, len, pbase_dir,
+			 /* output */
+			 &type_rl_list,
+			 &max_level);
+
+  for (pp = type_rl_list->next; pp->next; pp = pp->next)
+    {
+      int i;
+      int pos = RL_POS(pp);
+      int len = RL_LEN(pp);
+      int level = RL_LEVEL(pp);
+      for (i=0; i<len; i++)
+	embedding_level_list[pos + i] = level;
+    }
+
+  /* Free up the rl_list */
+  g_list_free(type_rl_list);
+}
+
+/*======================================================================
+//  fribidi_find_string_changes() finds the bounding box of the section
+//  of characters that need redrawing. It returns the start and the
+//  length of the section in the new string that needs redrawing.
+//----------------------------------------------------------------------*/
+void
+fribidi_find_string_changes(/* input */
+			    FriBidiChar *old_str,
+			    int old_len,
+			    FriBidiChar *new_str,
+			    int new_len,
+			    /* output */
+			    int *change_start,
+			    int *change_len
+			    )
+{
+  int i;
+  int num_bol, num_eol;
+
+  /* Search forwards */
+  i = 0;
+  while(    i < old_len
+	 && i < new_len
+	 && old_str[i] == new_str[i])
+    i++;
+  num_bol = i;
+
+  /* Search backwards */
+  i = 0;
+  while(    i <old_len
+	 && i <new_len
+	 && old_str[old_len-1-i] == new_str[new_len-1-i])
+    i++;
+  num_eol = i;
+
+  /* Assign output */
+  *change_start = num_bol;
+  *change_len = new_len - num_eol - num_bol;
 }

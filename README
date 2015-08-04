@@ -15,7 +15,7 @@ Audience
 It is my hope that this library will stimulate the implementation of
 Hebrew in lots of free software. Here is a small list of projects that
 would benifit from the use of the fribidi library, but of course there
-are many more: Wine, Mozilla, Gtk, AbiWord.
+are many more: Wine, Mozilla, Gtk, AbiWord, lynx.
 
 Downloading
 ===========
@@ -41,13 +41,13 @@ he wrote as a proposal for adding BiDi support to Mozilla.
 Internally the library uses Unicode entirely. The character property
 function was automatically created from the Unicode property list
 document PropList-2.1.8.txt available from the Unicode ftp site. This
-which means that every Unicode character should be treated in strict
+means that every Unicode character should be treated in strict
 accordance with the Unicode specification. The same is true for the
 mirroring of characters, which also works for all the characters
-listed as mirrorable in the the unicode specification.
+listed as mirrorable in the the Unicode specification.
 
 Other character sets must be converted into Unicode bofore the library
-is used. In order to use e.g. iso8859-8, the function
+may be used. In order to use e.g. iso8859-8, the function
 
      void
      fribidi_iso8859_8_to_unicode(guchar *s,
@@ -59,35 +59,46 @@ string. There is also a corresponding fribidi_unicode_to_iso8859_8
 that may be called to convert the string back to iso8859_8 for output.
 
 The reordering of characters is done through the function:
-
-    void
-    fribidi_log2vis(/* input */
-		    FriBidiChar *str, 
-		    int *pbase_dir,
-		    /* output */
-		    FriBidiChar *visual_str,
-		    gint *positionLtoV,
-		    gint *positionVtoL
-		    );
+      
+     void
+     fribidi_log2vis(/* input */
+		     FriBidiChar *str,
+		     int len,
+		     FriBidiCharType *pbase_dir,
+		     /* output */
+		     FriBidiChar *visual_str,
+		     gint        *position_L_to_V_list,
+		     gint        *position_V_to_L_list,
+		     gint8       *embedding_level_list
+		     )
     
 
 where
-     us            is the Unicode input string
-     base          is the input and output base direction. If base == 
-                   FRIBIDI_TYPE_N then the fribidi_log2vis determins the 
-                   base direction according to the BiDi algorithm.
-     out_us        The reordered output unicode string.
-     positionLtoV  Maps the positions in the logical string to positions
-                   in the visual string.
-     positionVtoL  Maps the positions in the visual string to positions 
-                   in the logical string.
+     str                    is the Unicode input string
+     len                    is the length of the unicode string
+     pbase_dir              is the input and output base direction. If 
+                            base == FRIBIDI_TYPE_N then fribidi_log2vis 
+                            calculates the base direction on its own
+                            according to the BiDi algorithm.
+     visual_str             The reordered output unicode string.
+     position_L_to_V_list   Maps the positions in the logical string to 
+                            positions in the visual string.
+     position_V_to_L_list   Maps the positions in the visual string to 
+                            the positions in the logical string.
+     embedding_level_list   Returns the classification of each character. Even
+                            levels indicate LTR characters, and odd levels
+                            indicate RTL characters. The main use of this
+                            list is in interactive applications when the
+                            embedding e.g. level determines cursor display.
+
+In any of the output pointers == NULL, then that information is not 
+calculated.
 
 A test program test_fribidi has been written to test out the algorithm.
 test_fribidi currently works on iso8859-8 by default, but by adding
 the flag -capital_rtl it treats capital letters as RTL, as is done
-in the Unicode specification. Please use this program as a reference
-of how to use this library.
-     
+for illustration purposes in the Unicode specification. 
+
 How it looks like
 =================
 
@@ -110,7 +121,7 @@ Executable
 ==========
 There is a also a command line utilitity called fribidi that loops over
 the text of a file and performs the BiDi algorithm on each line. Run
-fribidi with the help option to learn its usage.
+fribidi with the help option to learn its usage. 
 
 Bugs and comments
 =================

@@ -36,13 +36,34 @@ fribidi_is_arabic_strong(/* Input */
 void
 fribidi_set_debug(gboolean debug);
 
-void
-fribidi_log2vis(/* input */
-		FriBidiChar *str, int *pbase_dir,
-		/* output */
-		FriBidiChar *visual_str,
-		gint *positionLtoV,
-		gint *positionVtoL
-		);
+void fribidi_log2vis(/* input */
+		     FriBidiChar *str,
+		     int len,
+		     FriBidiCharType *pbase_dir,
+		     /* output */
+		     FriBidiChar *visual_str,
+		     gint        *position_L_to_V_list,
+		     gint        *position_V_to_L_list,
+		     gint8       *embedding_level_list
+		     );
 
+void fribidi_log2vis_get_embedding_levels(
+                     /* input */
+		     FriBidiChar *str,
+		     int len,
+		     FriBidiCharType *pbase_dir,
+		     /* output */
+		     gint8 *embedding_level_list
+		     );
+
+void
+fribidi_find_string_changes(/* input */
+			    FriBidiChar *old_str,
+			    int old_len,
+			    FriBidiChar *new_str,
+			    int new_len,
+			    /* output */
+			    int *change_start,
+			    int *change_len
+			    );
 #endif

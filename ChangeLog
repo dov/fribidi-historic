@@ -1,3 +1,27 @@
+1999-02-08  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Added options -ltr and -rtl to fribidi to force LTR and RTL 
+	  directions.
+
+	* Added function fribidi_log2vis_get_embedding_levels() which
+	  just returns an array of embedding levels.
+
+	* Added benchmark program.
+
+	* Added new check in test_fribidi that checks the changes 
+	  calculation.
+
+	* Changed interface to fribidi_log2vis() to include length of
+	  string on input and the embedding level of output.
+	
+	* Added function fribidi_find_string_changes() which finds the
+	  bounding box of the changes between two FriBidiStrings.
+
+1999-01-19  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Added the option -bol to fribidi_main.c to print out stuff
+	  in the beginning of a line.
+
 1999-01-14  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
 
 	* Released version 0.1.1
@@ -16,5 +40,3 @@
 1999-01-11  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
 
 	* First Release!
-	
-

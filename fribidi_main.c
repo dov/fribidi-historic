@@ -1,3 +1,22 @@
+/* FriBidi - Library of BiDi algorithm
+ * Copyright (C) 1999 Dov Grobgeld
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Library General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the GNU
+ * Library General Public License for more details.
+ *
+ * You should have received a copy of the GNU Library General Public
+ * License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ */
+
 /*======================================================================
 //  A main program for fribidi.
 //
@@ -88,7 +107,9 @@ int main(int argc, char *argv[])
   gboolean do_pad = TRUE;
   gboolean do_fill = FALSE;
   gint char_set = 0;
-  guchar *eol_text = NULL;
+  guchar *bol_text = NULL, *eol_text = NULL;
+  FriBidiCharType input_base_direction = FRIBIDI_TYPE_N;
+  
 
   /* Parse the command line */
   while(argp < argc && argv[argp][0] == '-')
@@ -106,6 +127,9 @@ int main(int argc, char *argv[])
 		 "    -fill        Fill lines up to margin. (Not implemented).\n"
 		 "    -width w     Specify width of text\n"
 		 "    -eol eol     End lines with the string given by eol.\n"
+		 "    -bol bol     Start lines with the string given by bol.\n"
+		 "    -rtl         Force base direction to RTL.\n"
+		 "    -ltr         Force base direction to LTR.\n"
 		 "    -charset cs  Specify charset. Default is CapRTL. Available options are:\n"
 		 "                     * 8859-8 (Hebrew)\n"
 		 "                     * 8859-6 (Arabic)\n"
@@ -117,6 +141,9 @@ int main(int argc, char *argv[])
       CASE("-nopad") { do_pad = FALSE; continue; }
       CASE("-width") { text_width = atoi(argv[argp++]); continue; }
       CASE("-eol")   { eol_text = argv[argp++]; continue; }
+      CASE("-bol")   { bol_text = argv[argp++]; continue; }
+      CASE("-rtl")   { input_base_direction = FRIBIDI_TYPE_R; continue; }
+      CASE("-ltr")   { input_base_direction = FRIBIDI_TYPE_L; continue; }
       CASE("-fill")  { do_fill = TRUE; continue; };
       CASE("-charset")
 	{
@@ -153,9 +180,8 @@ int main(int argc, char *argv[])
       {
 	int len = strlen(S_);
 	FriBidiChar us[2048], out_us[2048];
-	gint positionLtoV[2048], positionVtoL[2048];
 	guchar outstring[2048];
-	int base;
+	FriBidiCharType base;
 	int i;
 	
 	/* chop */
@@ -167,25 +193,32 @@ int main(int argc, char *argv[])
 	charset_to_unicode(char_set, S_, us);
       
 	/* Create a bidi string */
-	base = FRIBIDI_TYPE_N;
-	fribidi_log2vis(us, &base,
+	base = input_base_direction;
+	fribidi_log2vis(us,
+			len,
+			&base,
 			/* output */
 			out_us,
-			positionLtoV,
-			positionVtoL
+			NULL,   /* No need for log_to_vis mapping */
+			NULL,   /* No need for vis_to_log mapping */
+			NULL    /* No need for embedding level */
 			);
 
 	/* Convert it to something to print */
 	unicode_to_charset(char_set, out_us, outstring);
 
+	if (bol_text)
+	  printf("%s", bol_text);
+	
 	if (base == FRIBIDI_TYPE_R && do_pad)
 	  for (i=0; i<text_width-len; i++)
 	    printf(" ");
-	
+
 	printf("%s", outstring);
 	if (eol_text)
 	  printf("%s", eol_text);
 	printf("\n");
       }
   }
+  return 0;
 }

@@ -1,15 +1,14 @@
 LIBS = `gtk-config --libs`
-CFLAGS = `gtk-config --cflags`
+CFLAGS = -g -Wall `gtk-config --cflags`
 
-noinst_PROGRAMS = test_fribidi
+noinst_PROGRAMS = test_fribidi fribidi_benchmark
 
 lib_LIBRARIES = libfribidi.a
 libfribidi_a_SOURCES = \
 	fribidi.c	    \
 	fribidi_tables.i    \
 	fribidi_char_sets.c \
-	fribidi_get_type.c  \
-	test_fribidi.c
+	fribidi_get_type.c  
 
 libfribidiincdir = $(includedir)/fribidi
 libfribidiinc_HEADERS = \
@@ -27,6 +26,9 @@ EXTRA_DIST = \
 
 test_fribidi_SOURCES = test_fribidi.c
 test_fribidi_LDADD= libfribidi.a 
+
+fribidi_benchmark_SOURCES = fribidi_benchmark.c
+fribidi_benchmark_LDADD= libfribidi.a 
 
 bin_PROGRAMS = fribidi
 fribidi_SOURCES = fribidi_main.c

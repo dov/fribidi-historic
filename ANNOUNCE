@@ -1,20 +1,21 @@
-I have relased a new version 0.1.1 of fribidi with the following changes:
+I have relased a new version 0.1.2 of fribidi with the following changes:
 
-    * Added program fribidi as a command line interface to the library.
+	* Added options -ltr and -rtl to fribidi to force LTR and RTL 
+	  directions.
 
-    * Added flag -nopad to test_fribidi to make it not insert spaces.
+	* Added function fribidi_log2vis_get_embedding_levels() which
+	  just returns an array of embedding levels.
 
-    * Make P1 rules (ES and CS) work only if the span of the ES or
-      the CS is 1. This is the same as in Hebrew Windoze.
+	* Added benchmark program.
 
-    * Replaced all the ET rules with the simpler ET,EN=>EN,EN
+	* Added new check in test_fribidi that checks the changes 
+	  calculation.
 
-    * Added `gtk-config --cflags` and `gtk-config -ldflags` to Makefile.am.
-
-    * Made test_fribidi read from stdin if no file given.
-
-    * Added options -outputonly to test_fribidi .
-
+	* Changed interface to fribidi_log2vis() to include length of
+	  string on input and the embedding level of output.
+	
+	* Added function fribidi_find_string_changes() which finds the
+	  bounding box of the changes between two FriBidiStrings.
 
 Here's the blurb in case someone missed it:
 

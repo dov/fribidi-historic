@@ -398,14 +398,15 @@ void fribidi_log2vis(/* input */
       TYPE_RULE_C(EN,BN,AN,    EN,EN,AN);
 
       /* P1. */
-      TYPE_RULE_C(EN,ES,EN,   EN,EN,EN);
-      TYPE_RULE_C(EN,CS,EN,   EN,EN,EN);
-      TYPE_RULE_C(AN,CS,AN,   AN,AN,AN);
+      if (RL_LEN(pp) == 1) 
+	{
+	  TYPE_RULE_C(EN,ES,EN,   EN,EN,EN);
+	  TYPE_RULE_C(EN,CS,EN,   EN,EN,EN);
+	  TYPE_RULE_C(AN,CS,AN,   AN,AN,AN);
+	}
 
       /* P2. */
-      TYPE_RULE_C(ET,ET,EN,   EN,EN,EN);
-      TYPE_RULE_C(EN,ET,EN,   EN,EN,EN);
-      TYPE_RULE_C(AN,ET,EN,   AN,EN,EN);
+      TYPE_RULE2(ET,EN,   EN,EN);
     }
 
   compact_list(type_rl_list);

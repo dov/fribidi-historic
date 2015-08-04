@@ -106,6 +106,12 @@ HE SAID "it is 123, 456, ok"        =>        "it is 123, 456, ok" DIAS EH
 HE SAID "it is a car!" AND RAN      =>      NAR DNA "!it is a car" DIAS EH
 HE SAID "it is a car!x" AND RAN     =>     NAR DNA "it is a car!x" DIAS EH
 
+Executable
+==========
+There is a also a command line utilitity called fribidi that loops over
+the text of a file and performs the BiDi algorithm on each line. Run
+fribidi with the help option to learn its usage.
+
 Bugs and comments
 =================
 Send bug reports and comments about FriBidi to dov@imagic.weizmann.ac.il.

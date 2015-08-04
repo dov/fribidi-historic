@@ -1,3 +1,18 @@
+1999-01-14  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Released version 0.1.1
+	* Added program fribidi as a command line interface to the library.
+
+1999-01-13  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
+
+	* Added flag -nopad to test_fribidi to make it not insert spaces.
+	* Make P1 rules (ES and CS) work only if the span of the ES or
+	  the CS is 1. This is the same as in Hebrew Windoze.
+	* Replaced all the ET rules with the simpler ET,EN=>EN,EN
+        * Added `gtk-config --cflags` and `gtk-config -ldflags` to Makefile.am.
+        * Made test_fribidi read from stdin if no file given.
+        * Added options -outputonly to test_fribidi .
+
 1999-01-11  Dov Grobgeld  <dov@imagic.weizmann.ac.il>
 
 	* First Release!

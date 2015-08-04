@@ -1,5 +1,25 @@
-I am proud to announce the first alpha version of a FriBidi, a 
-Free BiDi library that adhers closely to the Unicode BiDi algorithm.
+I have relased a new version 0.1.1 of fribidi with the following changes:
+
+    * Added program fribidi as a command line interface to the library.
+
+    * Added flag -nopad to test_fribidi to make it not insert spaces.
+
+    * Make P1 rules (ES and CS) work only if the span of the ES or
+      the CS is 1. This is the same as in Hebrew Windoze.
+
+    * Replaced all the ET rules with the simpler ET,EN=>EN,EN
+
+    * Added `gtk-config --cflags` and `gtk-config -ldflags` to Makefile.am.
+
+    * Made test_fribidi read from stdin if no file given.
+
+    * Added options -outputonly to test_fribidi .
+
+
+Here's the blurb in case someone missed it:
+
+FriBidi is a free BiDi library that adhers closely to the Unicode BiDi
+algorithm.
 
 FriBidi is written in C and should provide a common API that will 
 facilitate porting of various software to support BiDirection 
@@ -21,6 +41,8 @@ he said "IT IS (123,456), OK"       => he said "KO ,(123,456) SI TI"
 HE SAID "it is 123, 456, ok"        =>        "it is 123, 456, ok" DIAS EH
 <H123>shalom</H123>                 =>                 <123H/>shalom<123H>
 <h123>SAALAM</h123>                 => <h123>MALAAS</h123>                
-HE SAID "it is a car!" AND RUN      =>      NUR DNA "!it is a car" DIAS EH
-HE SAID "it is a car!x" AND RUN     =>     NUR DNA "it is a car!x" DIAS EH
-
+HE SAID "it is a car!" AND RAN      =>      NAR DNA "!it is a car" DIAS EH
+HE SAID "it is a car!x" AND RAN     =>     NAR DNA "it is a car!x" DIAS EH
+-2 CELSIUS IS COLD                  =>                  DLOC SI SUISLEC -2
+SOLVE 1*5 1-5 1/5 1+5               =>               1+5 1/5 1-5 5*1 EVLOS
+THE RANGE IS 2.5..5                 =>                 5..2.5 SI EGNAR EHT

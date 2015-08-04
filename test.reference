@@ -9,3 +9,6 @@ HE SAID "it is 123, 456, ok"        =>        "it is 123, 456, ok" DIAS EH
 <h123>SAALAM</h123>                 => <h123>MALAAS</h123>                
 HE SAID "it is a car!" AND RAN      =>      NAR DNA "!it is a car" DIAS EH
 HE SAID "it is a car!x" AND RAN     =>     NAR DNA "it is a car!x" DIAS EH
+-2 CELSIUS IS COLD                  =>                  DLOC SI SUISLEC -2
+SOLVE 1*5 1-5 1/5 1+5               =>               1+5 1/5 1-5 5*1 EVLOS
+THE RANGE IS 2.5..5                 =>                 5..2.5 SI EGNAR EHT

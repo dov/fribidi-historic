@@ -69,7 +69,8 @@ PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 
-LIBS = -lglib
+LIBS = `gtk-config --libs`
+CFLAGS = `gtk-config --cflags`
 
 noinst_PROGRAMS = test_fribidi
 
@@ -98,6 +99,10 @@ EXTRA_DIST = \
 test_fribidi_SOURCES = test_fribidi.c
 test_fribidi_LDADD= libfribidi.a 
 
+bin_PROGRAMS = fribidi
+fribidi_SOURCES = fribidi_main.c
+fribidi_LDADD = libfribidi.a
+
 TESTS = run.tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -113,12 +118,14 @@ libfribidi_a_LIBADD =
 libfribidi_a_OBJECTS =  fribidi.o fribidi_char_sets.o fribidi_get_type.o \
 test_fribidi.o
 AR = ar
-PROGRAMS =  $(noinst_PROGRAMS)
+PROGRAMS =  $(bin_PROGRAMS) $(noinst_PROGRAMS)
 
+fribidi_OBJECTS =  fribidi_main.o
+fribidi_DEPENDENCIES =  libfribidi.a
+fribidi_LDFLAGS = 
 test_fribidi_OBJECTS =  test_fribidi.o
 test_fribidi_DEPENDENCIES =  libfribidi.a
 test_fribidi_LDFLAGS = 
-CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
 LINK = $(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(LDFLAGS) -o $@
@@ -134,8 +141,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP = --best
-SOURCES = $(libfribidi_a_SOURCES) $(test_fribidi_SOURCES)
-OBJECTS = $(libfribidi_a_OBJECTS) $(test_fribidi_OBJECTS)
+SOURCES = $(libfribidi_a_SOURCES) $(fribidi_SOURCES) $(test_fribidi_SOURCES)
+OBJECTS = $(libfribidi_a_OBJECTS) $(fribidi_OBJECTS) $(test_fribidi_OBJECTS)
 
 all: Makefile $(LIBRARIES) $(PROGRAMS) $(HEADERS) config.h
 
@@ -252,6 +259,31 @@ libfribidi.a: $(libfribidi_a_OBJECTS) $(libfribidi_a_DEPENDENCIES)
 	$(AR) cru libfribidi.a $(libfribidi_a_OBJECTS) $(libfribidi_a_LIBADD)
 	$(RANLIB) libfribidi.a
 
+mostlyclean-binPROGRAMS:
+
+clean-binPROGRAMS:
+	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+
+distclean-binPROGRAMS:
+
+maintainer-clean-binPROGRAMS:
+
+install-binPROGRAMS: $(bin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(bindir)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo " $(LIBTOOL)  --mode=install $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`"; \
+	    $(LIBTOOL)  --mode=install $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; \
+	done
+
+uninstall-binPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(bindir)/`echo $$p|sed '$(transform)'`; \
+	done
+
 mostlyclean-noinstPROGRAMS:
 
 clean-noinstPROGRAMS:
@@ -260,6 +292,10 @@ clean-noinstPROGRAMS:
 distclean-noinstPROGRAMS:
 
 maintainer-clean-noinstPROGRAMS:
+
+fribidi: $(fribidi_OBJECTS) $(fribidi_DEPENDENCIES)
+	@rm -f fribidi
+	$(LINK) $(fribidi_LDFLAGS) $(fribidi_OBJECTS) $(fribidi_LDADD) $(LIBS)
 
 test_fribidi: $(test_fribidi_OBJECTS) $(test_fribidi_DEPENDENCIES)
 	@rm -f test_fribidi
@@ -353,6 +389,8 @@ fribidi_char_sets.o: fribidi_char_sets.c fribidi.h fribidi_types.h \
 	fribidi_char_sets.h
 fribidi_get_type.o: fribidi_get_type.c fribidi.h fribidi_types.h \
 	fribidi_char_sets.h fribidi_tables.i
+fribidi_main.o: fribidi_main.c fribidi.h fribidi_types.h \
+	fribidi_char_sets.h
 test_fribidi.o: test_fribidi.c fribidi.h fribidi_types.h \
 	fribidi_char_sets.h
 
@@ -386,7 +424,7 @@ dvi:
 check: all
 	$(MAKE) check-TESTS
 installcheck:
-install-exec: install-libLIBRARIES
+install-exec: install-libLIBRARIES install-binPROGRAMS
 	@$(NORMAL_INSTALL)
 
 install-data: install-libfribidiincHEADERS
@@ -395,12 +433,13 @@ install-data: install-libfribidiincHEADERS
 install: install-exec install-data all
 	@:
 
-uninstall: uninstall-libLIBRARIES uninstall-libfribidiincHEADERS
+uninstall: uninstall-libLIBRARIES uninstall-binPROGRAMS uninstall-libfribidiincHEADERS
 
 install-strip:
 	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
 installdirs:
-	$(mkinstalldirs)  $(DATADIR)$(libdir) $(DATADIR)$(libfribidiincdir)
+	$(mkinstalldirs)  $(DATADIR)$(libdir) $(DATADIR)$(bindir) \
+		$(DATADIR)$(libfribidiincdir)
 
 
 mostlyclean-generic:
@@ -419,21 +458,23 @@ maintainer-clean-generic:
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 mostlyclean:  mostlyclean-hdr mostlyclean-libLIBRARIES \
 		mostlyclean-compile mostlyclean-libtool \
-		mostlyclean-noinstPROGRAMS mostlyclean-tags \
-		mostlyclean-generic
+		mostlyclean-binPROGRAMS mostlyclean-noinstPROGRAMS \
+		mostlyclean-tags mostlyclean-generic
 
 clean:  clean-hdr clean-libLIBRARIES clean-compile clean-libtool \
-		clean-noinstPROGRAMS clean-tags clean-generic \
-		mostlyclean
+		clean-binPROGRAMS clean-noinstPROGRAMS clean-tags \
+		clean-generic mostlyclean
 
 distclean:  distclean-hdr distclean-libLIBRARIES distclean-compile \
-		distclean-libtool distclean-noinstPROGRAMS \
-		distclean-tags distclean-generic clean
+		distclean-libtool distclean-binPROGRAMS \
+		distclean-noinstPROGRAMS distclean-tags \
+		distclean-generic clean
 	-rm -f config.status
 	-rm -f libtool
 
 maintainer-clean:  maintainer-clean-hdr maintainer-clean-libLIBRARIES \
 		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-binPROGRAMS \
 		maintainer-clean-noinstPROGRAMS maintainer-clean-tags \
 		maintainer-clean-generic distclean
 	@echo "This command is intended for maintainers to use;"
@@ -446,6 +487,8 @@ maintainer-clean-libLIBRARIES uninstall-libLIBRARIES \
 install-libLIBRARIES mostlyclean-compile distclean-compile \
 clean-compile maintainer-clean-compile mostlyclean-libtool \
 distclean-libtool clean-libtool maintainer-clean-libtool \
+mostlyclean-binPROGRAMS distclean-binPROGRAMS clean-binPROGRAMS \
+maintainer-clean-binPROGRAMS uninstall-binPROGRAMS install-binPROGRAMS \
 mostlyclean-noinstPROGRAMS distclean-noinstPROGRAMS \
 clean-noinstPROGRAMS maintainer-clean-noinstPROGRAMS \
 uninstall-libfribidiincHEADERS install-libfribidiincHEADERS tags \
@@ -455,6 +498,12 @@ install uninstall all installdirs mostlyclean-generic distclean-generic \
 clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
 
+
+test.reference : tests/test-capital-rtl
+	test_fribidi -capital_rtl tests/test-capital-rtl > test.reference
+
+test : 	test_fribidi 
+	test_fribidi -capital_rtl tests/test-capital-rtl
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

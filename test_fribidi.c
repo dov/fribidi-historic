@@ -28,9 +28,12 @@ int main(int argc, char *argv[])
   guchar S_[255];
   FriBidiChar us[255];
   FILE *IN;
+  gint pad_width = 35;
   gboolean do_use_order = FALSE;
   gboolean do_test_vtol = FALSE;
   gboolean do_cap_as_rtl = FALSE;
+  gboolean do_output_only = FALSE;
+  gboolean do_no_pad = FALSE;
 
   while(argp< argc && argv[argp][0] == '-')
     {
@@ -41,7 +44,8 @@ int main(int argc, char *argv[])
 	       "test_fribidi - A program for testing the fribidi library\n"
 	       "\n"
 	       "Syntax:\n"
-	       "    test_fribidi [-debug] [-test_vtol] [-order] [-capital_rtl]\n"
+	       "    test_fribidi [-debug] [-outputonly] [-test_vtol] [-order] [-capital_rtl]\n"
+	       "                 [-nopad]\n"
 	       "\n"
 	       "Description:\n"
 	       "    A program for running the BiDi algorithm on all the lines in\n"
@@ -49,6 +53,7 @@ int main(int argc, char *argv[])
 	       "\n"
 	       "Options:\n"
 	       "    -debug      Output debug info about the progress of the algorithm\n"
+	       "    -outputonly Don't print the original logical strings.\n"
 	       "    -test_vtol  Output string is according to the ltov array.\n"
 	       "    -test_ltov  Output string is according to the vtol array.\n"
 	       "    -capital_rtl  Treat capital letters as RTL letters.\n"
@@ -56,21 +61,23 @@ int main(int argc, char *argv[])
 	exit(0);
       }
 
+      CASE("-outputonly")  { do_output_only++; pad_width = 80; continue; };
       CASE("-test_vtol") { do_test_vtol++; continue; };
       CASE("-debug") { fribidi_set_debug(TRUE); continue; };
       CASE("-order") { do_use_order++; continue; };
       CASE("-capital_rtl") { do_cap_as_rtl++; continue; }; 
+      CASE("-nopad") { do_no_pad++; continue; };
 
       fprintf(stderr, "Unknown option %s!\n", S_);
       exit(0);
     }
   
   if (argp >= argc) {
-    fprintf(stderr, "Need name of file!\n");
-    exit(-1);
+    IN = stdin;
+  } else {
+    fn = argv[argp++];
+    IN = fopen(fn, "r");
   }
-  fn = argv[argp++];
-  IN = fopen(fn, "r");
 
   while(fgets(S_, sizeof(S_), IN))
     {
@@ -94,7 +101,8 @@ int main(int argc, char *argv[])
       len--;
 
       /* Output before the mapping */
-      printf("%-35s => ", S_);
+      if (!do_output_only)
+	printf("%-35s => ", S_);
       
       if (do_cap_as_rtl)
 	for (i=0; i<len; i++)
@@ -120,8 +128,8 @@ int main(int argc, char *argv[])
 	  if (outstring[i]>=0xE0 && outstring[i]<=0xFA)
 	    outstring[i]-= 0xE0 - 'A';  /* Map to capital letters */
       
-      if (base == FRIBIDI_TYPE_R)
-	for (i=0; i<35-len; i++)
+      if (base == FRIBIDI_TYPE_R && !do_no_pad)
+	for (i=0; i<pad_width-len; i++)
 	  printf(" ");
       
       if (do_use_order)
@@ -143,8 +151,8 @@ int main(int argc, char *argv[])
 	  printf("%s", outstring);
 	}
 
-      if (base == FRIBIDI_TYPE_L)
-	for (i=0; i<35-len; i++)
+      if (base == FRIBIDI_TYPE_L && !do_no_pad)
+	for (i=0; i<pad_width-len; i++)
 	  printf(" ");
       
       printf("\n");

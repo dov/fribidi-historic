@@ -1,5 +1,3 @@
-* Implement the rule that changes european numbers to arabic numbers.
-
 * Clean up code
 
 * Support LRE, RLE, RLO and LRO.
@@ -12,4 +10,33 @@
 
 * Is it worthwile to make the library shared? Comments?
 
-* Write a web page about this library.
+* Write a program, fribidi, that reads a text file and carries out 
+  the BiDi algorithm on it.
+
+* Write notes and a reference implementation for the following interactions
+  with fribidi:
+
+    - Terminal editing with cursor key interaction, e.g. through curses.
+      No mouse or cut and paste interaction.
+
+    - Like above (with fixed fonts?) but in an GUI environment where 
+      the mouse may be used to position the cursor.
+
+    - Like above but with the ability to do a mouse selection. At least
+      in logical mode, possibly in visual mode.
+
+    - Like above but with proportional fonts.
+
+    - Like above with proportional fonts and character attributes.
+
+    - Like above but with kerning between characters.
+
+* Write a description of the needed steps to convert a LTR editor into a
+  BiDi aware editor.
+
+* Make a the library callable through a perl module through Swig. 
+
+* Make interfaces to other scripting languages if there is any interest.
+
+* Implement fill algorithm in the fribidi program. (Perhaps this is 
+  a waste of time if the perl library is anyhow implemented.)

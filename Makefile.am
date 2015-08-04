@@ -1,4 +1,5 @@
-LIBS = -lglib
+LIBS = `gtk-config --libs`
+CFLAGS = `gtk-config --cflags`
 
 noinst_PROGRAMS = test_fribidi
 
@@ -26,5 +27,15 @@ EXTRA_DIST = \
 
 test_fribidi_SOURCES = test_fribidi.c
 test_fribidi_LDADD= libfribidi.a 
+
+bin_PROGRAMS = fribidi
+fribidi_SOURCES = fribidi_main.c
+fribidi_LDADD = libfribidi.a
+
+test.reference : tests/test-capital-rtl
+	test_fribidi -capital_rtl tests/test-capital-rtl > test.reference
+
+test : 	test_fribidi 
+	test_fribidi -capital_rtl tests/test-capital-rtl
 
 TESTS = run.tests
